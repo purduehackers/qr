@@ -26,6 +26,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }).draw()
 
   // Alternative: ph_logo_margin.png, logoScale: 0.25, no logoMargin
+  // Alternative: ph_logo_block.png, logoScale: 0.2, logoMargin: 18
+  // Alternative: ph_logo_block.png, logoScale: 0.18, logoMargin: 24
+  // Alternative: ph_logo.png, logoScale: 0.15, logoMargin: 40
 
   res.setHeader('Content-Type', 'image/png')
   res.send(buffer)
