@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev"
+    "dev": "next dev",
+    "vercel-build": "cp canvas_lib64/*so.1 node_modules/canvas/build/Release/ && next build",
+    "start": "next start"
   },
   "author": "MatthewStanciu",
   "license": "MIT",
