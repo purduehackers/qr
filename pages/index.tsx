@@ -1,8 +1,25 @@
+import Head from 'next/head'
 import Nav from '../components/nav'
 
 const Index = () => {
   return (
     <div className="min-h-screen overflow-hidden flex flex-col font-title dark:bg-gray-900">
+      <Head>
+        <meta property="og:site_name" content="Purdue Hackers" />
+        <meta property="og:name" content="QR Codes — Purdue Hackers" />
+        <meta property="og:title" content="QR Codes — Purdue Hackers" />
+        <meta
+          property="og:image"
+          content="https://og.purduehackers.com/QR%20Codes.png?theme=light&md=1&fontSize=300px&caption="
+        />
+        <meta
+          property="og:description"
+          content="A website & API for generating custom, Purdue Hackers-branded QR Codes."
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:type" content="website" />
+        <title>QR Codes — Purdue Hackers</title>
+      </Head>
       <Nav />
       <div className="flex flex-col items-center justify-top mt-0 grow-0 w-full flex-1 px-5 pb-8 sm:pb-16 text-center sm:px-20 bg-gray-100 dark:bg-gray-800">
         <div className="mt-8 sm:mt-16">
