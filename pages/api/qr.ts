@@ -18,10 +18,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const buffer = await new AwesomeQR({
     text: `${data}`,
-    size: 500,
+    size: 1000,
     logoImage: logo,
     logoScale: 0.25,
-    logoCornerRadius: 1
+    logoMargin: 35,
+    logoCornerRadius: 0
   }).draw()
 
   res.setHeader('Content-Type', 'image/png')
