@@ -9,7 +9,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(401).send('Bad query')
   }
 
-  const logo = fs.readFileSync('static/ph_logo.png')
+  const logo = fs.readFileSync('../static/ph_logo.png')
 
   const buffer = await new AwesomeQR({
     text: `${data}`,
