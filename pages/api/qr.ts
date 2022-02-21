@@ -13,7 +13,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const logo = fs.readFileSync(
-    path.join(process.cwd(), 'static', 'ph_logo.png')
+    path.join(process.cwd(), 'static', 'ph_logo_margin.png')
   )
 
   const buffer = await new AwesomeQR({
@@ -21,8 +21,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     size: 1000,
     logoImage: logo,
     logoScale: 0.25,
-    logoMargin: 35,
-    logoCornerRadius: 0
+    logoCornerRadius: 1
   }).draw()
 
   res.setHeader('Content-Type', 'image/png')
