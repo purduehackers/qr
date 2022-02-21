@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
+    "dev-build": "next build",
     "vercel-build": "cp canvas_lib64/*so.1 node_modules/canvas/build/Release/ && next build",
     "start": "next start"
   },
