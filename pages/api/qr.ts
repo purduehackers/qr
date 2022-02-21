@@ -8,7 +8,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (data === undefined) {
     return res
-      .status(401)
+      .status(400)
       .send('Bad request; format your request like /api/qr?data=your_data')
   }
 
