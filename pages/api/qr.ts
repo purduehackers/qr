@@ -7,7 +7,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data = req.query.data
 
   if (data === undefined) {
-    return res.status(401).send('Bad query')
+    return res
+      .status(401)
+      .send('Bad request; format your request like /api/qr?data=your_data')
   }
 
   const logo = fs.readFileSync(
