@@ -20,8 +20,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     text: `${data}`,
     size: 500,
     logoImage: logo,
-    logoScale: 0.3,
-    logoCornerRadius: 2
+    logoScale: 0.25,
+    logoCornerRadius: 1
   }).draw()
 
   res.setHeader('Content-Type', 'image/png')
