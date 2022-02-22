@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import Head from 'next/head'
 import Nav from '../components/nav'
+import Qr from '../components/qr'
 
 const Index = () => {
+  const [url, setUrl] = useState('')
   return (
     <div className="min-h-screen overflow-hidden flex flex-col font-title dark:bg-gray-900">
       <Head>
@@ -28,14 +31,25 @@ const Index = () => {
           </h1>
         </div>
       </div>
-      <div className="container px-5 sm:px-20 py-8">
-        <p className="text-xl">
-          This website is a WIP. For now, you can get a QR code by fetching{' '}
+      <div className="p-8">
+        <p className="text-center text-xl">
+          This website is a WIP. You can download this image, but you'll have to
+          rename it after you download it. In the meantime, the API provides a
+          better experience—try fetching{' '}
           <span>
-            <code>`/api/qr?data=your_data`</code>
+            <code>/api/qr?data=your_data</code>
           </span>
           .
         </p>
+      </div>
+      <div className="container flex flex-col justify-center gap-x-4 md:flex-row px-5 sm:px-20 py-8 mt-8">
+        <form onSubmit={(e) => e.preventDefault()}>
+          <input
+            onChange={(e) => setUrl(e.target.value)}
+            defaultValue="https://purduehackers.com"
+          ></input>
+        </form>
+        <Qr data={url} />
       </div>
     </div>
   )
