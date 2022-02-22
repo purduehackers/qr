@@ -1,9 +1,7 @@
-import { AwesomeQRCode } from '@awesomeqr/react'
 import { AwesomeQR } from 'awesome-qr'
 import { useState } from 'react'
-//import logoImg from '../public/ph_logo_block.png'
 
-const Qr = ({ data, logo }) => {
+const Qr = ({ data, logo }: { data: string; logo: string }) => {
   const [url, setUrl] = useState('')
 
   new AwesomeQR({
@@ -15,7 +13,7 @@ const Qr = ({ data, logo }) => {
     logoCornerRadius: 1
   })
     .draw()
-    .then((dataUrl) => setUrl(dataUrl.toString('base64')))
+    .then((dataUrl) => setUrl(dataUrl?.toString('base64') || ''))
   return <img src={url} className="w-1/3"></img>
 }
 

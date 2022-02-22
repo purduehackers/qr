@@ -4,7 +4,7 @@ import { GetStaticProps } from 'next'
 import Nav from '../components/nav'
 import Qr from '../components/qr'
 
-const Index = ({ logo }) => {
+const Index = ({ logo }: { logo: string }) => {
   const [url, setUrl] = useState('')
   return (
     <div className="min-h-screen overflow-hidden flex flex-col font-title dark:bg-gray-900">
