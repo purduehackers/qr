@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import Head from 'next/head'
+import { GetStaticProps } from 'next'
 import Nav from '../components/nav'
 import Qr from '../components/qr'
 
-const Index = () => {
+const Index = ({ logo }) => {
   const [url, setUrl] = useState('')
   return (
     <div className="min-h-screen overflow-hidden flex flex-col font-title dark:bg-gray-900">
@@ -49,10 +50,27 @@ const Index = () => {
             defaultValue="https://purduehackers.com"
           ></input>
         </form>
-        <Qr data={url} />
+        <Qr data={url} logo={logo} />
       </div>
     </div>
   )
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  const fs = require('fs')
+  const path = require('path')
+
+  const logo = fs.readFileSync(
+    path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
+  )
+  const logoString = logo.toString('base64')
+  console.log(logoString)
+
+  return {
+    props: {
+      logo: logoString
+    }
+  }
 }
 
 export default Index
