@@ -13,7 +13,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const logo = fs.readFileSync(
-    path.join(process.cwd(), 'public', 'ph_logo_block.png')
+    path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
   )
 
   const buffer = await new AwesomeQR({
