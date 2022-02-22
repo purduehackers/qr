@@ -63,7 +63,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const imgPath = path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
   const logo = fs.readFileSync(imgPath, { encoding: 'base64' })
-  const mimetype = mime.getType()
+  const mimetype = mime.getType(imgPath)
 
   const b64 = `data:${mimetype};base64,${logo}`
 
