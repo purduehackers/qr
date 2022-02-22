@@ -59,16 +59,17 @@ const Index = ({ logo }) => {
 export const getStaticProps: GetStaticProps = async () => {
   const fs = require('fs')
   const path = require('path')
+  const mime = require('mime')
 
-  const logo = fs.readFileSync(
-    path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
-  )
-  const logoString = logo.toString('base64')
-  console.log(logoString)
+  const imgPath = path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
+  const logo = fs.readFileSync(imgPath, { encoding: 'base64' })
+  const mimetype = mime.getType()
+
+  const b64 = `data:${mimetype};base64,${logo}`
 
   return {
     props: {
-      logo: logoString
+      logo: b64
     }
   }
 }

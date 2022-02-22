@@ -10,6 +10,7 @@ const Qr = ({ data, logo }) => {
     text: data,
     size: 1000,
     logoScale: 0.2,
+    logoImage: logo,
     logoMargin: 18,
     logoCornerRadius: 1
   })
