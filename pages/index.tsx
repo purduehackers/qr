@@ -55,6 +55,10 @@ const Index = ({ logo }: { logo: string }) => {
             className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
           >
             <textarea
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter some QR code data..."
               className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
