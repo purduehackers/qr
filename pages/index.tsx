@@ -52,13 +52,13 @@ const Index = ({ logo }: { logo: string }) => {
           </h2>
           <form
             onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col xs:flex-row items-left gap-y-2 xs:gap-x-2 mb-1"
+            className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
           >
-            <input
+            <textarea
               onChange={(e) => setUrl(e.target.value)}
               placeholder="Enter some QR code data..."
-              className="rounded border-none outline-none dark:bg-gray-100 dark:text-gray-900"
-            ></input>
+              className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
+            ></textarea>
           </form>
         </div>
         <Qr data={url} logo={logo} />
