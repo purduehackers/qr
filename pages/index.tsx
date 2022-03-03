@@ -34,17 +34,6 @@ const Index = ({ logo }: { logo: string }) => {
           </h1>
         </div>
       </div>
-      <div className="p-8 container mx-auto p-8 px-4 md:px-16 lg:px-72 xl:px-96 md:flex md:justify-center md:items-center md:mx-auto">
-        <p className="text-center md:text-left text-xl">
-          This website is a WIP. You can download this image, but you'll have to
-          rename it after you download it. In the meantime, the API provides a
-          better experience—try fetching{' '}
-          <span>
-            <code>/api/qr?data=your_data</code>
-          </span>
-          .
-        </p>
-      </div>
       <div className="w-full flex flex-col md:flex-row items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col justify-top gap-y-1 mb-8">
         <div className="flex flex-col w-full sm:w-auto">
           <h2 className="font-bold text-center text-2xl dark:text-white dark:font-extrabold">
@@ -66,6 +55,66 @@ const Index = ({ logo }: { logo: string }) => {
           </form>
         </div>
         <Qr data={url} logo={logo} />
+      </div>
+      <div className="p-8 container mx-auto p-8 px-4 md:px-16 lg:px-72 xl:px-96 flex justify-center flex-col gap-y-2 mx-auto">
+        <h2 className="text-3xl sm:text-4xl lg:text-5-xl font-bold text-amber-450 dark:text-amber-500">
+          What is this?
+        </h2>
+        <p className="text-xl">
+          This is a website that generates Purdue Hackers-branded QR codes. It's
+          meant for internal use, but it's a public website in case you want to
+          make a QR code with our branding for some reason.
+        </p>
+        <h2 className="text-3xl sm:text-4xl lg:text-5-xl font-bold text-amber-450 dark:text-amber-500 mt-6">
+          API
+        </h2>
+        <p className="text-xl">
+          This website also includes an API to programmatically generate QR
+          codes. You can use it by fetching{' '}
+          <span>
+            <code>/api/qr?data=YOUR_DATA</code>
+          </span>
+          . Check out{' '}
+          <StyledLink
+            destination="https://ph-qr.vercel.app/api/qr?data=https%3A%2F%2Fpurduehackers.com"
+            newTab
+          >
+            this example
+          </StyledLink>
+          !
+        </p>
+        <h2 className="text-3xl sm:text-4xl lg:text-5-xl font-bold text-amber-450 dark:text-amber-500 mt-6">
+          Make it your own!
+        </h2>
+        <p className="text-xl">
+          If you like this website and want to make your own version, this
+          project is open-source{' '}
+          <StyledLink
+            destination="https://github.com/MatthewStanciu/ph-qr"
+            newTab
+          >
+            on our GitHub
+          </StyledLink>
+          . All you need to do is add your own logo to the{' '}
+          <span>
+            <code>public</code>
+          </span>{' '}
+          folder, then change{' '}
+          <StyledLink
+            destination="https://github.com/MatthewStanciu/ph-qr/blob/main/pages/index.tsx#L89"
+            newTab
+          >
+            this line
+          </StyledLink>{' '}
+          and{' '}
+          <StyledLink
+            destination="https://github.com/MatthewStanciu/ph-qr/blob/main/pages/api/qr.ts#L16"
+            newTab
+          >
+            this line
+          </StyledLink>
+          .
+        </p>
       </div>
       <footer className="bg-gray-100 dark:bg-gray-800 text-center dark:text-gray-100 bottom-0 mt-auto w-full flex flex-col justify-center gap-y-4 py-8 px-4">
         <p>
