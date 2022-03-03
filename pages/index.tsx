@@ -34,7 +34,7 @@ const Index = ({ logo }: { logo: string }) => {
           </h1>
         </div>
       </div>
-      <div className="p-8 md:w-[680px] md:flex md:justify-center md:items-center md:mx-auto">
+      <div className="p-8 container mx-auto p-8 px-4 md:px-16 lg:px-72 xl:px-96 md:flex md:justify-center md:items-center md:mx-auto">
         <p className="text-center md:text-left text-xl">
           This website is a WIP. You can download this image, but you'll have to
           rename it after you download it. In the meantime, the API provides a
