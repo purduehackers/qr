@@ -76,7 +76,7 @@ const Index = ({ logo }: { logo: string }) => {
           </span>
           . Check out{' '}
           <StyledLink
-            destination="https://ph-qr.vercel.app/api/qr?data=https%3A%2F%2Fpurduehackers.com"
+            destination="https://qr.purduehackers.com/api/qr?data=https%3A%2F%2Fpurduehackers.com"
             newTab
           >
             this example
