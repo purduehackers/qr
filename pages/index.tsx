@@ -3,6 +3,8 @@ import Head from 'next/head'
 import { GetStaticProps } from 'next'
 import Nav from '../components/nav'
 import Qr from '../components/qr'
+import StyledLink from '../components/styled-link'
+import FooterLinks from '../components/footer-links'
 
 const Index = ({ logo }: { logo: string }) => {
   const [url, setUrl] = useState('')
@@ -32,8 +34,8 @@ const Index = ({ logo }: { logo: string }) => {
           </h1>
         </div>
       </div>
-      <div className="p-8">
-        <p className="text-center text-xl">
+      <div className="p-8 md:w-[680px] md:flex md:justify-center md:items-center md:mx-auto">
+        <p className="text-center md:text-left text-xl">
           This website is a WIP. You can download this image, but you'll have to
           rename it after you download it. In the meantime, the API provides a
           better experience—try fetching{' '}
@@ -43,15 +45,34 @@ const Index = ({ logo }: { logo: string }) => {
           .
         </p>
       </div>
-      <div className="container flex flex-col justify-center gap-x-4 md:flex-row px-5 sm:px-20 py-8 mt-8">
-        <form onSubmit={(e) => e.preventDefault()}>
-          <input
-            onChange={(e) => setUrl(e.target.value)}
-            defaultValue="https://purduehackers.com"
-          ></input>
-        </form>
+      <div className="w-full flex flex-col items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto md:flex-row px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col justify-top gap-y-1 mb-8">
+        <div className="">
+          <h2 className="font-bold text-2xl dark:text-white dark:font-extrabold">
+            Edit QR code data here 👇
+          </h2>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex flex-col xs:flex-row items-left gap-y-2 xs:gap-x-2 mb-1"
+          >
+            <input
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Enter some QR code data..."
+              className="rounded border-none outline-none dark:bg-gray-100 dark:text-gray-900"
+            ></input>
+          </form>
+        </div>
         <Qr data={url} logo={logo} />
       </div>
+      <footer className="bg-gray-100 dark:bg-gray-800 text-center dark:text-gray-100 bottom-0 mt-auto w-full flex flex-col justify-center gap-y-4 py-8 px-4">
+        <p>
+          Made with 💛 by the{' '}
+          <StyledLink destination="https://purduehackers.com" newTab>
+            Purdue Hackers
+          </StyledLink>{' '}
+          organizing team.
+        </p>
+        <FooterLinks />
+      </footer>
     </div>
   )
 }

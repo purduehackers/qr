@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@awesomeqr/react": "^0.1.2-rc.0",
+    "@icons-pack/react-simple-icons": "^4.6.1",
     "@vercel/node": "^1.13.0",
     "awesome-qr": "^2.1.5-rc.0",
     "mime": "^3.0.0",
