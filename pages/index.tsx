@@ -45,9 +45,9 @@ const Index = ({ logo }: { logo: string }) => {
           .
         </p>
       </div>
-      <div className="w-full flex flex-col items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto md:flex-row px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col justify-top gap-y-1 mb-8">
-        <div className="">
-          <h2 className="font-bold text-2xl dark:text-white dark:font-extrabold">
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col justify-top gap-y-1 mb-8">
+        <div className="flex flex-col w-full sm:w-auto">
+          <h2 className="font-bold text-center text-2xl dark:text-white dark:font-extrabold">
             Edit QR code data here 👇
           </h2>
           <form
