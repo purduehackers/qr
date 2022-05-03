@@ -5,6 +5,7 @@ import Nav from '../components/nav'
 import Qr from '../components/qr'
 import StyledLink from '../components/styled-link'
 import FooterLinks from '../components/footer-links'
+import VercelBanner from '../components/vercel-banner'
 
 const Index = ({ logo }: { logo: string }) => {
   const [url, setUrl] = useState('')
@@ -125,6 +126,7 @@ const Index = ({ logo }: { logo: string }) => {
           organizing team.
         </p>
         <FooterLinks />
+        <VercelBanner />
       </footer>
     </div>
   )
