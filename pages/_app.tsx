@@ -8,7 +8,7 @@ function App({ Component, pageProps }: AppProps) {
     <ThemeProvider attribute="class">
       <Head>
         <meta name="theme-color" content="#D97706" />
-        <link rel="shortcut icon" href="/public/favicon.ico" />
+        <link rel="shortcut icon" href="/favicon.ico" />
       </Head>
       <Component {...pageProps} />
     </ThemeProvider>
