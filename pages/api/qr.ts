@@ -6,7 +6,7 @@ import path from 'path'
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data = req.query.data
 
-  if (data === undefined) {
+  if (!data) {
     return res
       .status(400)
       .send('Bad request; format your request like /api/qr?data=your_data')
