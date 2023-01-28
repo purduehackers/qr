@@ -9,6 +9,8 @@ import VercelBanner from '../components/vercel-banner'
 
 const Index = ({ logo }: { logo: string }) => {
   const [url, setUrl] = useState('')
+  const [colorLight, setColorLight] = useState('white')
+  const [colorDark, setColorDark] = useState('black')
   return (
     <div className="min-h-screen overflow-hidden flex flex-col font-title dark:bg-gray-900">
       <Head>
@@ -36,7 +38,7 @@ const Index = ({ logo }: { logo: string }) => {
         </div>
       </div>
       <div className="w-full flex flex-col md:flex-row items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col justify-top gap-y-1 mb-8">
-        <div className="flex flex-col w-full sm:w-auto">
+        <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
           <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
             Edit QR code data here 👇
           </h2>
@@ -55,7 +57,53 @@ const Index = ({ logo }: { logo: string }) => {
             ></textarea>
           </form>
         </div>
-        <Qr data={url} logo={logo} />
+        <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
+          <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
+            What color would you like the foreground to be?
+          </h2>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
+          >
+            <input
+              type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+              onChange={(e) => setColorDark(e.target.value)}
+              placeholder='somethin like "blue"'
+              className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
+            ></input>
+          </form>
+        </div>
+        <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
+          <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
+            What color would you like the background to be?
+          </h2>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
+          >
+            <input
+              type="text"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
+              onChange={(e) => setColorLight(e.target.value)}
+              placeholder='consider trying "red"'
+              className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
+            ></input>
+          </form>
+        </div>
+
+        <Qr
+          data={url}
+          logo={logo}
+          lightColor={colorLight}
+          darkColor={colorDark}
+        />
       </div>
       <div className="p-8 container mx-auto p-8 px-4 md:px-16 lg:px-72 xl:px-96 flex justify-center flex-col gap-y-2 mx-auto">
         <h2 className="text-3xl sm:text-4xl lg:text-5-xl font-bold text-amber-450 dark:text-amber-500">
