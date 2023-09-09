@@ -1,25 +1,12 @@
 import { AwesomeQR } from 'awesome-qr'
 import { useState } from 'react'
 
-const Qr = ({
-  data,
-  logo,
-  lightColor,
-  darkColor
-}: {
-  data: string
-  logo: string
-  lightColor: string
-  darkColor: string
-}) => {
+const Qr = ({ data, logo }: { data: string; logo: string }) => {
   const [url, setUrl] = useState('')
 
   new AwesomeQR({
     text: data,
-    colorLight: lightColor,
-    colorDark: darkColor,
     size: 1000,
-    autoColor: false,
     logoScale: 0.2,
     logoImage: logo,
     logoMargin: 18,
