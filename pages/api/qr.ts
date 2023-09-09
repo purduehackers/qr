@@ -5,6 +5,8 @@ import path from 'path'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data = req.query.data
+  const lightColor = req.query.lightColor
+  const darkColor = req.query.darkColor
 
   if (!data) {
     return res
@@ -18,8 +20,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const buffer = await new AwesomeQR({
     text: `${data}`,
+    colorDark: `${lightColor}`,
+    colorLight: `${darkColor}`,
     size: 1000,
     logoImage: logo,
+    autoColor: false,
     logoScale: 0.2,
     logoMargin: 18,
     logoCornerRadius: 1
