@@ -5,9 +5,12 @@ import path from 'path'
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const data = req.query.data
-  const lightColor = req.query.lightColor
-  const darkColor = req.query.darkColor
+  const lightInput = String(req.query.lightColor)
+  const lightColor = CSS.supports('color', lightInput) ? lightInput : 'black'
+  const darkInput = String(req.query.darkColor)
+  const darkColor = CSS.supports('color', darkInput) ? darkInput : 'white'
 
+  CSS.supports('color', String(darkColor)) ? String(darkColor) : 'black'
   if (!data) {
     return res
       .status(400)
@@ -15,13 +18,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const logo = fs.readFileSync(
-    path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
+    path.resolve(process.cwd(), 'public', 'PurdueHackers.svg')
   )
 
   const buffer = await new AwesomeQR({
     text: `${data}`,
-    colorDark: `${lightColor}`,
-    colorLight: `${darkColor}`,
+    colorDark: `${darkColor}`,
+    colorLight: `${lightColor}`,
     size: 1000,
     logoImage: logo,
     autoColor: false,

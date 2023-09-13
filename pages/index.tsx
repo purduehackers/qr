@@ -38,65 +38,67 @@ const Index = ({ logo }: { logo: string }) => {
         </div>
       </div>
       <div className="w-full flex flex-col md:flex-row items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col gap-y-1 mb-8">
-        <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
-          <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
-            Edit QR code data here 👇
-          </h2>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
-          >
-            <textarea
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter some QR code data..."
-              className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
-            ></textarea>
-          </form>
-        </div>
-        <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
-          {/* not able to color the text here */}
-          <h2 className="font-bold color-red text-left text-2xl px-1 font-extrabold">
-            What color would you like the foreground to be?
-          </h2>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
-          >
-            <input
-              type="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
-              onChange={(e) => setColorDark(e.target.value)}
-              placeholder='somethin like "blue"'
-              className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
-            ></input>
-          </form>
-        </div>
-        <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
-          <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
-            What color would you like the background to be?
-          </h2>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
-          >
-            <input
-              type="text"
-              autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
-              onChange={(e) => setColorLight(e.target.value)}
-              placeholder='consider trying "red"'
-              className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
-            ></input>
-          </form>
+        <div>
+          <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
+            <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
+              Edit QR code data here 👇
+            </h2>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
+            >
+              <textarea
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter some QR code data..."
+                className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
+              ></textarea>
+            </form>
+          </div>
+          <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
+            {/* I'm able to color the text here now*/}
+            <h2 className="font-bold text-red-400 text-left text-2xl px-1 font-extrabold">
+              What color would you like the foreground to be?
+            </h2>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
+            >
+              <input
+                type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                onChange={(e) => setColorDark(e.target.value)}
+                placeholder='somethin like "blue"'
+                className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
+              ></input>
+            </form>
+          </div>
+          <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
+            <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
+              What color would you like the background to be?
+            </h2>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex flex-col xs:flex-row items-center gap-y-2 xs:gap-x-2 mb-1"
+            >
+              <input
+                type="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                onChange={(e) => setColorLight(e.target.value)}
+                placeholder='consider trying "red"'
+                className="rounded border-none outline-none resize-none dark:bg-gray-900 dark:text-gray-100 my-4 p-2 w-full"
+              ></input>
+            </form>
+          </div>
         </div>
 
         <Qr
@@ -189,10 +191,12 @@ export const getStaticProps: GetStaticProps = async () => {
   const path = require('path')
   const mime = require('mime')
 
-  const imgPath = path.resolve(process.cwd(), 'public', 'ph_logo_block.png')
-  const logo = fs.readFileSync(imgPath, { encoding: 'base64' })
+  const imgPath = path.resolve(process.cwd(), 'public', 'PurdueHackers.svg')
+  const logoRead = fs.readFileSync(imgPath, { encoding: 'base64' })
+
   const mimetype = mime.getType(imgPath)
 
+  const logo = fs.readFileSync(imgPath, { encoding: 'base64' })
   const b64 = `data:${mimetype};base64,${logo}`
 
   return {
