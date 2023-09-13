@@ -37,7 +37,7 @@ const Index = ({ logo }: { logo: string }) => {
           </h1>
         </div>
       </div>
-      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col justify-top gap-y-1 mb-8">
+      <div className="w-full flex flex-col md:flex-row items-center justify-center gap-x-12 w-11/12 md:w-2/3 mx-auto px-5 sm:px-20 py-8 mt-8 rounded-lg shadow-md dark:shadow-black/25 bg-gray-200 dark:bg-gray-700 p-4 flex flex-col gap-y-1 mb-8">
         <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
           <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
             Edit QR code data here 👇
@@ -58,7 +58,8 @@ const Index = ({ logo }: { logo: string }) => {
           </form>
         </div>
         <div className="flex flex-col w-full sm:w-autoex flex-col w-full sm:w-auto">
-          <h2 className="font-bold text-left text-2xl px-1 font-extrabold">
+          {/* not able to color the text here */}
+          <h2 className="font-bold color-red text-left text-2xl px-1 font-extrabold">
             What color would you like the foreground to be?
           </h2>
           <form
