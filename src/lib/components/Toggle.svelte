@@ -29,19 +29,22 @@
 		background: var(--track);
 		border: 1px solid var(--ink);
 		padding: 3px;
-		display: flex;
-		align-items: center;
-		justify-content: flex-start;
 		overflow: clip;
+		transition: background-color 0.1s linear;
 	}
 	.toggle.on {
-		justify-content: flex-end;
 		background: var(--accent);
 	}
 	.toggle .knob {
+		display: block;
 		width: 14px;
 		height: 14px;
 		background: var(--surface);
 		border: 1px solid var(--ink);
+		transition: transform 0.1s linear;
+	}
+	/* Content box is 32px wide, knob 14px → slides 18px to sit flush right. */
+	.toggle.on .knob {
+		transform: translateX(18px);
 	}
 </style>

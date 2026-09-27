@@ -23,6 +23,13 @@
 	} = $props();
 
 	let qrSrc = $state('');
+	// The card's checkerboard / background must track the *displayed* image, not the
+	// live props. The QR is an async render that lands ~150ms after a toggle, so
+	// styling the card off the prop makes the checkerboard flash on/off out of sync
+	// with the image. These mirror the transparency/bg baked into the current qrSrc.
+	let shownTransparent = $state(false);
+	// Seeded with the default bg; the first render commits the real value (see below).
+	let shownBg = $state('#ffffff');
 
 	function hexToRgb(hex: string) {
 		const m = hex.replace('#', '');
@@ -226,9 +233,22 @@
 
 		if (tr) {
 			const fg = hexToRgb(fgHex);
+			// A pixel matching the (washed) sentinel background is a light module and
+			// must go fully transparent. This guard is essential when fg is light: the
+			// library's white wash pushes light modules along the bg→white line, which
+			// is collinear with bg→fg, so the projection below can't tell a washed
+			// background from ~60%-opaque foreground and would leave a white tint.
+			const nearBg = (
+				p: { r: number; g: number; b: number },
+				v: { r: number; g: number; b: number }
+			) => Math.abs(p.r - v.r) <= 16 && Math.abs(p.g - v.g) <= 16 && Math.abs(p.b - v.b) <= 16;
 			for (let i = 0; i < d.length; i += 4) {
 				if (d[i + 3] === 0) continue;
 				const p = { r: d[i], g: d[i + 1], b: d[i + 2] };
+				if (nearBg(p, variants[0]) || nearBg(p, variants[1]) || nearBg(p, variants[2])) {
+					d[i + 3] = 0;
+					continue;
+				}
 				// Project p onto the line S→fg for each background variant; keep the
 				// best fit's blend factor t as the pixel's alpha.
 				let bestT = 1;
@@ -371,8 +391,12 @@
 			}
 
 			const result = await new QR(opts).draw();
-			if (typeof result === 'string')
+			if (typeof result === 'string') {
 				qrSrc = await normalizeColors(result, c, bgEffective, tr, renderSize);
+				// Commit the card styling together with the image so they never disagree.
+				shownTransparent = tr;
+				shownBg = bg;
+			}
 		} catch (err) {
 			console.error('QR generation failed', err);
 		}
@@ -413,11 +437,16 @@
 		return Math.max(21, Math.min(177, mc));
 	}
 
-	// Regenerate (debounced) whenever any input changes.
+	// Regenerate whenever any input changes. Only text typing is debounced —
+	// discrete controls (toggles, colour, logo) fire immediately so the QR keeps
+	// pace with the control's own animation instead of lagging ~150ms behind.
+	let prevText = '';
 	$effect(() => {
 		const a: GenArgs = [text, logoUrl, logoName, transparent, color, bgColor, invertLogo];
 		if (!AwesomeQR) return;
-		const id = setTimeout(() => scheduleGenerate(a), 150);
+		const delay = text !== prevText ? 150 : 0;
+		prevText = text;
+		const id = setTimeout(() => scheduleGenerate(a), delay);
 		return () => clearTimeout(id);
 	});
 
@@ -441,43 +470,78 @@
 </script>
 
 <section class="preview">
-	<div class="qr">
-		{#if qrSrc}
-			<img src={qrSrc} alt="Generated QR code" />
-		{/if}
+	<div class="qr-card" class:checker={shownTransparent} style={shownTransparent ? undefined : `background:${shownBg}`}>
+		<div class="qr">
+			{#if qrSrc}
+				<img src={qrSrc} alt="Generated QR code" />
+			{/if}
+		</div>
 	</div>
-	<div class="preview-actions">
-		<button type="button" class="icon-btn" aria-label="Copy QR code" onclick={copyImage}>
-			<img src={copyIcon} alt="" />
-		</button>
-		<button type="button" class="icon-btn" aria-label="Download QR code" onclick={downloadImage}>
-			<img src={downloadIcon} alt="" />
-		</button>
+	<div class="actions-card">
+		<div class="preview-actions">
+			<button type="button" class="icon-btn" aria-label="Copy QR code" onclick={copyImage}>
+				<span class="icon" style:--icon={`url("${copyIcon}")`}></span>
+			</button>
+			<button type="button" class="icon-btn" aria-label="Download QR code" onclick={downloadImage}>
+				<span class="icon" style:--icon={`url("${downloadIcon}")`}></span>
+			</button>
+		</div>
 	</div>
 </section>
 
 <style>
 	.preview {
 		width: 385px;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.qr-card,
+	.actions-card {
+		width: 100%;
 		background: #fff;
 		border: 2px solid #000;
 		padding: 12px;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		gap: 12px;
 		overflow: clip;
 	}
+	/* Transparent mode: show a checkerboard behind the QR so the transparency reads.
+	   Mid-tone greys (not white/light-grey) so the QR stays visible whether its
+	   modules are dark (light mode) or white (dark mode); fine 8px squares average
+	   to a neutral grey behind each module instead of half-hiding it. */
+	.qr-card.checker {
+		background-color: #b8b8b8;
+		background-image:
+			linear-gradient(45deg, #8c8c8c 25%, transparent 25%),
+			linear-gradient(-45deg, #8c8c8c 25%, transparent 25%),
+			linear-gradient(45deg, transparent 75%, #8c8c8c 75%),
+			linear-gradient(-45deg, transparent 75%, #8c8c8c 75%);
+		background-size: 8px 8px;
+		background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+	}
 	.qr {
+		position: relative;
 		width: 100%;
 		aspect-ratio: 357 / 356;
-		background: #fff;
 	}
 	.qr img {
+		position: absolute;
+		inset: 0;
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
 		display: block;
+		/* The source PNG has crisp integer-pixel modules, but it's downscaled to the
+		   fixed card width (e.g. 1008px → ~714 device px) by a non-integer factor.
+		   With smooth resampling the module edges land mid-device-pixel and get
+		   averaged into grey seams ("subpixel offsets"). Force nearest-neighbour so
+		   each device pixel samples one source pixel — halves the grey edge pixels
+		   and keeps the grid sharp. Fallbacks first; `pixelated` wins where supported. */
+		image-rendering: -webkit-optimize-contrast;
+		image-rendering: crisp-edges;
+		image-rendering: pixelated;
 	}
 
 	.preview-actions {
@@ -496,9 +560,18 @@
 		align-items: center;
 		justify-content: center;
 	}
-	.icon-btn img {
+	/* Stroke SVGs used as alpha masks so we can recolor them (accent on hover:
+	   purple in light mode, yellow in dark mode). */
+	.icon-btn .icon {
 		width: 24px;
 		height: 24px;
 		display: block;
+		background: #000;
+		-webkit-mask: var(--icon) center / contain no-repeat;
+		mask: var(--icon) center / contain no-repeat;
+		transition: background-color 0.15s linear;
+	}
+	.icon-btn:hover .icon {
+		background: var(--accent);
 	}
 </style>

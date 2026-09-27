@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import QrCode from '$lib/components/QrCode.svelte';
 	import Toggle from '$lib/components/Toggle.svelte';
 	import ColorSwatch from '$lib/components/ColorSwatch.svelte';
@@ -21,6 +22,17 @@
 	let color = $state('#000000');
 	let bgColor = $state('#ffffff');
 	let invertLogo = $state(false);
+
+	// In dark mode, default the QR to white-on-black so it matches the page theme.
+	// Done on mount (client only) so SSR keeps the light defaults and the color
+	// swatches don't hydrate-mismatch; runs before any user interaction, so it's
+	// only a default — picking a colour afterwards sticks.
+	onMount(() => {
+		if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+			color = '#ffffff';
+			bgColor = '#000000';
+		}
+	});
 </script>
 
 <svelte:head>
@@ -266,9 +278,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		transition: border-width 0.15s linear, border-color 0.15s linear;
 	}
 	.logo-box.selected {
-		border: 4px solid var(--accent);
+		border-width: 4px;
+		border-color: var(--accent);
 	}
 	.logo-box img {
 		width: 100%;
