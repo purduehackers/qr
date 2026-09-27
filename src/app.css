@@ -138,15 +138,6 @@
 	background: repeating-linear-gradient(45deg, transparent 0 3px, var(--color-ink) 3px 4px);
 }
 
-/* The QR PNG has crisp integer-pixel modules but is downscaled by a non-integer
-   factor; force nearest-neighbour so module edges stay sharp. Fallbacks first;
-   `pixelated` wins where supported. */
-@utility pixelated {
-	image-rendering: -webkit-optimize-contrast;
-	image-rendering: crisp-edges;
-	image-rendering: pixelated;
-}
-
 /* Texture-layer opacity: full in light mode, dimmed in dark. Lives on .page so the
    dark overrides below can retune it alongside the colours. */
 .page {

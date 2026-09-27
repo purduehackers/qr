@@ -31,6 +31,15 @@
 	// Seeded with the default bg; the first render commits the real value (see below).
 	let shownBg = $state('#ffffff');
 
+	// The QR is displayed by re-rasterizing qrSrc onto this canvas at the card's exact
+	// device-pixel size (see paintCanvas). qrSrc itself stays hi-res for copy/download.
+	let qrCanvas: HTMLCanvasElement;
+	let qrBox: HTMLDivElement;
+	// Cached from the latest render so a resize can repaint without regenerating.
+	let srcImage: HTMLImageElement | null = null;
+	let srcModuleCount = 0;
+	let srcCellPx = 0;
+
 	function hexToRgb(hex: string) {
 		const m = hex.replace('#', '');
 		const full = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
@@ -163,6 +172,14 @@
 		const mod = await import('awesome-qr/dist/awesome-qr.js');
 		AwesomeQR = mod.AwesomeQR ?? mod.default?.AwesomeQR ?? mod.default;
 		scheduleGenerate([text, logoUrl, logoName, transparent, color, bgColor, invertLogo]);
+	});
+
+	// Repaint at the new device-pixel size whenever the card is resized (viewport
+	// resize, mobile↔desktop layout switch) so the QR stays crisp at any width.
+	$effect(() => {
+		const ro = new ResizeObserver(() => schedulePaint());
+		ro.observe(qrBox);
+		return () => ro.disconnect();
 	});
 
 	const SIZE = 1024;
@@ -393,13 +410,64 @@
 			const result = await new QR(opts).draw();
 			if (typeof result === 'string') {
 				qrSrc = await normalizeColors(result, c, bgEffective, tr, renderSize);
+				// Cache the render's module geometry so paintCanvas (and later resizes) can
+				// re-rasterize crisply. cellPx is the whole-pixel width of a module in qrSrc.
+				srcImage = await loadImage(qrSrc);
+				srcModuleCount = moduleCount;
+				srcCellPx = cellPx;
 				// Commit the card styling together with the image so they never disagree.
 				shownTransparent = tr;
 				shownBg = bg;
+				paintCanvas();
 			}
 		} catch (err) {
 			console.error('QR generation failed', err);
 		}
+	}
+
+	// Draw the cached QR onto the display canvas at the card's exact device-pixel size.
+	// The browser downscaling the raster <img> by a non-integer factor left some modules
+	// a pixel wider than others (the visible misalignment). Instead we blit each module
+	// into its own rect with rounded, shared boundaries — so every module edge lands on a
+	// whole device pixel and widths stay uniform. imageSmoothingEnabled=false keeps the
+	// solid modules crisp; the logo tile rides along.
+	function paintCanvas() {
+		if (!qrCanvas || !qrBox || !srcImage || srcModuleCount <= 0) return;
+		const dpr = window.devicePixelRatio || 1;
+		const cssW = qrBox.clientWidth;
+		const cssH = qrBox.clientHeight;
+		if (cssW === 0 || cssH === 0) return;
+		const N = srcModuleCount;
+		const cp = srcCellPx;
+		// Backing store = card size in device pixels (never below one px per module).
+		const dw = Math.max(N, Math.round(cssW * dpr));
+		const dh = Math.max(N, Math.round(cssH * dpr));
+		qrCanvas.width = dw;
+		qrCanvas.height = dh;
+		const ctx = qrCanvas.getContext('2d');
+		if (!ctx) return;
+		ctx.clearRect(0, 0, dw, dh);
+		ctx.imageSmoothingEnabled = false;
+		for (let j = 0; j < N; j++) {
+			const dy0 = Math.round((j * dh) / N);
+			const dy1 = Math.round(((j + 1) * dh) / N);
+			for (let i = 0; i < N; i++) {
+				const dx0 = Math.round((i * dw) / N);
+				const dx1 = Math.round(((i + 1) * dw) / N);
+				ctx.drawImage(srcImage, i * cp, j * cp, cp, cp, dx0, dy0, dx1 - dx0, dy1 - dy0);
+			}
+		}
+	}
+
+	// Coalesce repaint requests (e.g. rapid ResizeObserver fires) into one per frame.
+	let paintScheduled = false;
+	function schedulePaint() {
+		if (paintScheduled) return;
+		paintScheduled = true;
+		requestAnimationFrame(() => {
+			paintScheduled = false;
+			paintCanvas();
+		});
 	}
 
 	// Infer the QR's module count from a rendered data URL by measuring the width
@@ -478,11 +546,15 @@
 		class:checker={shownTransparent}
 		style={shownTransparent ? undefined : `background:${shownBg}`}
 	>
-		<div class="relative aspect-[357/356] w-full">
-			{#if qrSrc}
-				<!-- pixelated: keep the downscaled module grid crisp (nearest-neighbour). -->
-				<img class="pixelated absolute inset-0 block h-full w-full object-contain" src={qrSrc} alt="Generated QR code" />
-			{/if}
+		<!-- The QR is re-rasterized onto this canvas at the card's exact device-pixel
+		     size (see paintCanvas) so module edges stay aligned instead of getting
+		     smeared by a non-integer raster downscale. -->
+		<div bind:this={qrBox} class="relative aspect-[357/356] w-full">
+			<canvas
+				bind:this={qrCanvas}
+				class="absolute inset-0 block h-full w-full"
+				class:invisible={!qrSrc}
+			>Generated QR code</canvas>
 		</div>
 	</div>
 	<!-- Icon section: solid card fill (white in light mode, black in dark). -->
