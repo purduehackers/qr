@@ -24,5 +24,8 @@
 	},
 	"dependencies": {
 		"awesome-qr": "^2.1.5-rc.0"
-	}
+	},
+	"trustedDependencies": [
+		"awesome-qr"
+	]
 }
