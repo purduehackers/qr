@@ -1,3 +1,5 @@
+@import 'tailwindcss';
+
 /* Fonts from the Figma design.
    Font files live in src/lib/assets/fonts/ and are bundled by Vite. */
 @font-face {
@@ -99,20 +101,88 @@
 	font-display: swap;
 }
 
-* {
-	box-sizing: border-box;
+/* Theme tokens. Registering them here makes Tailwind emit matching utilities
+   (bg-surface, text-ink, border-ink, text-accent, font-pixel, …) that compile to
+   var(--color-*) — so the light/dark overrides below re-theme every utility at once.
+   Values are the light ("white mode") theme; dark mode overrides them further down. */
+@theme {
+	--color-ink: #000000;
+	--color-surface: #fbf7ec;
+	--color-muted: #7f7f7f;
+	--color-accent: #7d3bff;
+	--color-track: #cccccc;
+	--color-divider: #949494;
+	--color-card: #ffffff;
+
+	--font-pixel: 'PixelHackers', monospace;
+	--font-relax: 'PolySans Relax', sans-serif;
+	--font-neutral: 'PolySans Neutral', sans-serif;
 }
 
-html,
-body {
-	margin: 0;
-	padding: 0;
+/* Transparent-mode checkerboard behind the QR. Mid-tone greys (not white/light-grey)
+   so the QR stays visible whether its modules are dark (light mode) or white (dark
+   mode); fine 8px squares average to a neutral grey behind each module. */
+@utility checker {
+	background-color: #b8b8b8;
+	background-image:
+		linear-gradient(45deg, #8c8c8c 25%, transparent 25%),
+		linear-gradient(-45deg, #8c8c8c 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #8c8c8c 75%),
+		linear-gradient(-45deg, transparent 75%, #8c8c8c 75%);
+	background-size: 8px 8px;
+	background-position: 0 0, 0 4px, 4px -4px, -4px 0;
 }
 
+/* Diagonal hatch used to cross out a disabled colour swatch. */
+@utility hatch {
+	background: repeating-linear-gradient(45deg, transparent 0 3px, var(--color-ink) 3px 4px);
+}
+
+/* The QR PNG has crisp integer-pixel modules but is downscaled by a non-integer
+   factor; force nearest-neighbour so module edges stay sharp. Fallbacks first;
+   `pixelated` wins where supported. */
+@utility pixelated {
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+}
+
+/* Texture-layer opacity: full in light mode, dimmed in dark. Lives on .page so the
+   dark overrides below can retune it alongside the colours. */
+.page {
+	--tex-opacity: 1;
+}
+
+/* Follow the OS unless the user has picked a theme explicitly (.light/.dark). */
+@media (prefers-color-scheme: dark) {
+	.page:not(.light):not(.dark) {
+		--color-ink: #fbf7ec;
+		--color-surface: #000000;
+		--color-muted: #d8cdae;
+		--color-accent: #fcd202;
+		--color-track: #4e4949;
+		--color-divider: #4e4949;
+		--color-card: #000000;
+		--tex-opacity: 0.1;
+	}
+}
+
+/* Explicit dark choice — wins over the media query above. */
+.page.dark {
+	--color-ink: #fbf7ec;
+	--color-surface: #000000;
+	--color-muted: #d8cdae;
+	--color-accent: #fcd202;
+	--color-track: #4e4949;
+	--color-divider: #4e4949;
+	--color-card: #000000;
+	--tex-opacity: 0.1;
+}
+
+/* Body sits behind the full-viewport .page; only shows on overscroll. */
 body {
 	background: #fbf7ec;
 }
-
 @media (prefers-color-scheme: dark) {
 	body {
 		background: #000000;

@@ -6,71 +6,23 @@
 	}: { value?: string; label?: string; disabled?: boolean } = $props();
 </script>
 
-<label class="option" class:disabled>
-	<span class="swatch">
-		<span class="swatch-fill" style:background-color={value}></span>
-		<input type="color" bind:value {disabled} />
+<!-- Disabled (e.g. background color while transparent bg is on): mute the label and
+     cross the swatch out with diagonal hatch marks. -->
+<label class="flex w-full items-center gap-2 {disabled ? 'cursor-not-allowed' : 'cursor-pointer'}">
+	<span class="relative flex h-[22px] w-10 items-center overflow-clip border border-ink bg-surface p-0.5">
+		{#if disabled}
+			<span class="hatch pointer-events-none absolute inset-0"></span>
+		{:else}
+			<span class="h-full grow shrink-0 basis-0" style:background-color={value}></span>
+		{/if}
+		<input
+			type="color"
+			bind:value
+			{disabled}
+			class="absolute inset-0 h-full w-full border-none p-0 opacity-0 {disabled
+				? 'pointer-events-none'
+				: 'cursor-pointer'}"
+		/>
 	</span>
-	<span class="option-label">{label}</span>
+	<span class="font-neutral text-xs {disabled ? 'text-muted' : 'text-ink'}">{label}</span>
 </label>
-
-<style>
-	.option {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		width: 100%;
-		cursor: pointer;
-	}
-	/* Disabled (e.g. background color while transparent bg is on): mute the label
-	   and cross the swatch out with diagonal hatch marks. */
-	.option.disabled {
-		cursor: not-allowed;
-	}
-	.option.disabled .option-label {
-		color: var(--muted);
-	}
-	.option.disabled .swatch input {
-		pointer-events: none;
-	}
-	.option.disabled .swatch-fill {
-		display: none;
-	}
-	.option.disabled .swatch::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: repeating-linear-gradient(45deg, transparent 0 3px, var(--ink) 3px 4px);
-		pointer-events: none;
-	}
-	.option-label {
-		font-family: 'PolySans Neutral', sans-serif;
-		font-size: 12px;
-		color: var(--ink);
-	}
-	.swatch {
-		position: relative;
-		width: 40px;
-		height: 22px;
-		background: var(--surface);
-		border: 1px solid var(--ink);
-		padding: 2px;
-		display: flex;
-		align-items: center;
-		overflow: clip;
-	}
-	.swatch-fill {
-		flex: 1 0 0;
-		height: 100%;
-	}
-	.swatch input[type='color'] {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		opacity: 0;
-		border: none;
-		padding: 0;
-		cursor: pointer;
-	}
-</style>

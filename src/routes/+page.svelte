@@ -50,56 +50,70 @@
 	<title>Purdue Hackers QR</title>
 </svelte:head>
 
-<div class="page" class:light={theme === 'light'} class:dark={theme === 'dark'}>
+<div
+	class="page relative min-h-screen w-full overflow-hidden bg-surface"
+	class:light={theme === 'light'}
+	class:dark={theme === 'dark'}
+>
 	<NoiseTexture seed={text} />
 
-	<header class="header">
-		<div class="brand" aria-label="Purdue Hackers">
-			<span class="px" style="left: 0; top: 20.667px;"></span>
-			<span class="px" style="left: 10.333px; top: 10.333px;"></span>
-			<span class="px" style="left: 20.667px; top: 10.333px;"></span>
-			<span class="px" style="left: 20.667px; top: 20.667px;"></span>
-			<span class="px" style="left: 10.333px; top: 0;"></span>
+	<header
+		class="absolute top-[29px] left-0 z-[1] flex w-full items-start justify-between px-6 max-[800px]:top-5"
+	>
+		<div class="relative h-[31px] w-[31px] shrink-0" aria-label="Purdue Hackers">
+			<span class="absolute h-[10.333px] w-[10.333px] bg-ink" style="left: 0; top: 20.667px;"></span>
+			<span class="absolute h-[10.333px] w-[10.333px] bg-ink" style="left: 10.333px; top: 10.333px;"></span>
+			<span class="absolute h-[10.333px] w-[10.333px] bg-ink" style="left: 20.667px; top: 10.333px;"></span>
+			<span class="absolute h-[10.333px] w-[10.333px] bg-ink" style="left: 20.667px; top: 20.667px;"></span>
+			<span class="absolute h-[10.333px] w-[10.333px] bg-ink" style="left: 10.333px; top: 0;"></span>
 		</div>
-		<div class="tagline">
-			<p class="title">
-				<span class="title-full">just a purdue hackers QR code generator</span>
-				<span class="title-short">purdue hackers QR code generator</span>
+		<div class="flex w-[387px] flex-col items-end gap-1.5 max-[800px]:w-auto max-[800px]:gap-1">
+			<p class="m-0 font-pixel text-[20px] whitespace-nowrap text-ink max-[800px]:text-[15px] max-[800px]:leading-[1.2]">
+				<span class="max-[800px]:hidden">just a purdue hackers QR code generator</span>
+				<span class="hidden max-[800px]:inline">purdue hackers QR code generator</span>
 			</p>
-			<a class="github" href="#">check out da github</a>
+			<a class="font-pixel text-xs text-muted underline max-[800px]:text-[10px]" href="#">check out da github</a>
 		</div>
 	</header>
 
-	<main class="stage">
-		<section class="controls">
-			<div class="field">
-				<p class="label">Enter QR code data</p>
-				<div class="textbox">
-					<textarea bind:value={text} placeholder="mrrow mrrp meow"></textarea>
+	<main
+		class="absolute inset-0 z-[1] flex items-center justify-center gap-5 max-[800px]:static max-[800px]:flex-col-reverse max-[800px]:gap-6 max-[800px]:px-6 max-[800px]:pt-24 max-[800px]:pb-12"
+	>
+		<section class="flex w-[358px] flex-col items-start gap-3 max-[800px]:w-full max-[800px]:max-w-[420px]">
+			<div class="flex w-full flex-col items-start gap-1">
+				<p class="m-0 w-full font-relax text-base text-ink">Enter QR code data</p>
+				<div class="h-[93px] w-full overflow-clip border-2 border-ink bg-surface p-2">
+					<textarea
+						class="h-full w-full resize-none border-none bg-transparent p-0 font-neutral text-base text-ink outline-none placeholder:font-neutral placeholder:text-base placeholder:text-[#767676] placeholder:italic placeholder:opacity-100"
+						bind:value={text}
+						placeholder="mrrow mrrp meow"
+					></textarea>
 				</div>
 			</div>
 
-			<div class="field">
-				<p class="label">Settings</p>
-				<div class="settings">
-					<div class="logo-selector">
+			<div class="flex w-full flex-col items-start gap-1">
+				<p class="m-0 w-full font-relax text-base text-ink">Settings</p>
+				<div class="flex w-full flex-col items-start gap-2 overflow-clip border-2 border-ink bg-surface p-2">
+					<div class="flex h-[50px] items-end gap-2">
 						{#each logos as logo, i (logo.name)}
 							<button
 								type="button"
-								class="logo-box"
-								class:selected={selected === i}
+								class="flex h-[50px] w-[50px] cursor-pointer items-center justify-center overflow-clip bg-surface p-0 transition-[border-color,border-width] duration-[50ms] ease-linear {selected ===
+								i
+									? 'border-4 border-accent'
+									: 'border border-ink'}"
 								aria-pressed={selected === i}
 								aria-label={`Use ${logo.name}`}
 								onclick={() => (selected = i)}
 							>
-								<img src={logo.url} alt="" />
+								<img class="h-full w-full object-contain" src={logo.url} alt="" />
 							</button>
 						{/each}
 					</div>
 
-					<div class="divider"></div>
+					<div class="h-px w-full bg-divider"></div>
 
-					<div class="options">
+					<div class="flex w-full flex-col items-start gap-2">
 						<Toggle bind:checked={invertLogo} label="invert logo" />
 						<ColorSwatch bind:value={color} label="color" />
 						<ColorSwatch bind:value={bgColor} label="background color" disabled={transparent} />
@@ -108,7 +122,7 @@
 				</div>
 			</div>
 
-			<a class="api-link" href="#">Need an API?</a>
+			<a class="w-full font-neutral text-xs text-accent underline" href="#">Need an API?</a>
 		</section>
 
 		<QrCode
@@ -124,13 +138,14 @@
 
 	<button
 		type="button"
-		class="theme-toggle"
+		class="fixed right-6 bottom-6 z-[2] flex h-10 w-10 cursor-pointer items-center justify-center border-2 border-ink bg-surface p-0 text-ink"
 		onclick={toggleTheme}
 		aria-label="Toggle dark mode"
 	>
 		{#if theme === 'dark'}
 			<!-- sun — click to switch to light -->
 			<svg
+				class="block h-5 w-5"
 				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
@@ -147,6 +162,7 @@
 		{:else}
 			<!-- moon — click to switch to dark -->
 			<svg
+				class="block h-5 w-5"
 				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
@@ -160,286 +176,3 @@
 		{/if}
 	</button>
 </div>
-
-<style>
-	.page {
-		/* Light ("white mode") theme. Dark mode overrides these below. */
-		--ink: #000000;
-		--surface: #fbf7ec;
-		--muted: #7f7f7f;
-		--accent: #7d3bff;
-		--track: #cccccc;
-		--divider: #949494;
-		--card-bg: #ffffff;
-		--tex-opacity: 1;
-		position: relative;
-		min-height: 100vh;
-		width: 100%;
-		background-color: var(--surface);
-		overflow: hidden;
-	}
-
-	/* Follow the OS unless the user has picked a theme explicitly (.light/.dark). */
-	@media (prefers-color-scheme: dark) {
-		.page:not(.light):not(.dark) {
-			--ink: #fbf7ec;
-			--surface: #000000;
-			--muted: #d8cdae;
-			--accent: #fcd202;
-			--track: #4e4949;
-			--divider: #4e4949;
-			--card-bg: #000000;
-			--tex-opacity: 0.1;
-		}
-	}
-
-	/* Explicit dark choice — wins over the media query above. */
-	.page.dark {
-		--ink: #fbf7ec;
-		--surface: #000000;
-		--muted: #d8cdae;
-		--accent: #fcd202;
-		--track: #4e4949;
-		--divider: #4e4949;
-		--card-bg: #000000;
-		--tex-opacity: 0.1;
-	}
-
-	.theme-toggle {
-		position: fixed;
-		bottom: 24px;
-		right: 24px;
-		width: 40px;
-		height: 40px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0;
-		background: var(--surface);
-		border: 2px solid var(--ink);
-		color: var(--ink);
-		cursor: pointer;
-		z-index: 2;
-	}
-	.theme-toggle svg {
-		width: 20px;
-		height: 20px;
-		display: block;
-	}
-
-	/* Header */
-	.header {
-		position: absolute;
-		top: 29px;
-		left: 0;
-		width: 100%;
-		padding: 0 24px;
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		z-index: 1;
-	}
-
-	.brand {
-		position: relative;
-		width: 31px;
-		height: 31px;
-		flex-shrink: 0;
-	}
-	.brand .px {
-		position: absolute;
-		width: 10.333px;
-		height: 10.333px;
-		background: var(--ink);
-	}
-
-	.tagline {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 6px;
-		width: 387px;
-	}
-	.title {
-		margin: 0;
-		font-family: 'PixelHackers', monospace;
-		font-size: 20px;
-		color: var(--ink);
-		white-space: nowrap;
-	}
-	/* Full wording on desktop; the mobile media query swaps in the short one. */
-	.title-short {
-		display: none;
-	}
-	.github {
-		font-family: 'PixelHackers', monospace;
-		font-size: 12px;
-		color: var(--muted);
-		text-decoration: underline;
-	}
-
-	/* Centered two-panel stage */
-	.stage {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 20px;
-		z-index: 1;
-	}
-
-	/* Left controls panel */
-	.controls {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 12px;
-		width: 358px;
-	}
-
-	.field {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 4px;
-		width: 100%;
-	}
-	.label {
-		margin: 0;
-		font-family: 'PolySans Relax', sans-serif;
-		font-size: 16px;
-		color: var(--ink);
-		width: 100%;
-	}
-
-	.textbox {
-		width: 100%;
-		height: 93px;
-		background: var(--surface);
-		border: 2px solid var(--ink);
-		padding: 8px;
-		overflow: clip;
-	}
-	.textbox textarea {
-		width: 100%;
-		height: 100%;
-		border: none;
-		outline: none;
-		resize: none;
-		background: transparent;
-		font-family: 'PolySans Neutral', sans-serif;
-		font-size: 16px;
-		color: var(--ink);
-		padding: 0;
-	}
-	.textbox textarea::placeholder {
-		font-family: 'PolySans Neutral', sans-serif;
-		font-style: italic;
-		font-size: 16px;
-		color: #767676;
-		opacity: 1;
-	}
-
-	/* Settings box */
-	.settings {
-		width: 100%;
-		background: var(--surface);
-		border: 2px solid var(--ink);
-		padding: 8px;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 8px;
-		overflow: clip;
-	}
-
-	.logo-selector {
-		display: flex;
-		align-items: flex-end;
-		gap: 8px;
-		height: 50px;
-	}
-	.logo-box {
-		width: 50px;
-		height: 50px;
-		background: var(--surface);
-		border: 1px solid var(--ink);
-		padding: 0;
-		cursor: pointer;
-		overflow: clip;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: border-width 0.05s linear, border-color 0.05s linear;
-	}
-	.logo-box.selected {
-		border-width: 4px;
-		border-color: var(--accent);
-	}
-	.logo-box img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
-	.divider {
-		width: 100%;
-		height: 1px;
-		background: var(--divider);
-	}
-
-	.options {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 8px;
-		width: 100%;
-	}
-
-	.api-link {
-		font-family: 'PolySans Neutral', sans-serif;
-		font-size: 12px;
-		color: var(--accent);
-		text-decoration: underline;
-		width: 100%;
-	}
-
-	@media (max-width: 800px) {
-		.stage {
-			position: static;
-			/* QR preview on top, data + settings underneath it. */
-			flex-direction: column-reverse;
-			align-items: center;
-			padding: 96px 24px 48px;
-			gap: 24px;
-		}
-		/* Match the QR preview's width so the two stack equiwidth (see QrCode.svelte). */
-		.controls {
-			width: 100%;
-			max-width: 420px;
-		}
-
-		/* Shrink the top-right title/link so it doesn't dominate the small screen. */
-		.header {
-			top: 20px;
-		}
-		.tagline {
-			width: auto;
-			gap: 4px;
-		}
-		.title {
-			font-size: 15px;
-			line-height: 1.2;
-		}
-		.title-full {
-			display: none;
-		}
-		.title-short {
-			display: inline;
-		}
-		.github {
-			font-size: 10px;
-		}
-	}
-</style>

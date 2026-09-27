@@ -86,18 +86,9 @@
 	});
 </script>
 
-<canvas bind:this={canvas} class="noise" aria-hidden="true"></canvas>
-
-<style>
-	.noise {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		display: block;
-		pointer-events: none;
-		/* Inherited from .page: 1 in light mode, 0.1 in dark mode. */
-		opacity: var(--tex-opacity, 1);
-		z-index: 0;
-	}
-</style>
+<!-- opacity is set on .page: 1 in light mode, 0.1 in dark mode. -->
+<canvas
+	bind:this={canvas}
+	class="pointer-events-none absolute inset-0 z-0 block h-full w-full [opacity:var(--tex-opacity,1)]"
+	aria-hidden="true"
+></canvas>

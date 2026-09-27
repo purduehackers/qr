@@ -469,121 +469,49 @@
 	}
 </script>
 
-<section class="preview">
-	<div class="qr-card" class:checker={shownTransparent} style={shownTransparent ? undefined : `background:${shownBg}`}>
-		<div class="qr">
+<!-- Mobile: fill the stacked column so the QR matches the controls' width. -->
+<section class="flex w-[385px] flex-col gap-2 max-[800px]:w-full max-[800px]:max-w-[420px]">
+	<!-- Transparent mode shows a checkerboard behind the QR (see the `checker` utility);
+	     otherwise the card takes the chosen bg colour. -->
+	<div
+		class="flex w-full flex-col items-end overflow-clip border-2 border-ink p-3"
+		class:checker={shownTransparent}
+		style={shownTransparent ? undefined : `background:${shownBg}`}
+	>
+		<div class="relative aspect-[357/356] w-full">
 			{#if qrSrc}
-				<img src={qrSrc} alt="Generated QR code" />
+				<!-- pixelated: keep the downscaled module grid crisp (nearest-neighbour). -->
+				<img class="pixelated absolute inset-0 block h-full w-full object-contain" src={qrSrc} alt="Generated QR code" />
 			{/if}
 		</div>
 	</div>
-	<div class="actions-card">
-		<div class="preview-actions">
-			<button type="button" class="icon-btn" aria-label="Copy QR code" onclick={copyImage}>
-				<span class="icon" style:--icon={`url("${copyIcon}")`}></span>
+	<!-- Icon section: solid card fill (white in light mode, black in dark). -->
+	<div class="flex w-full flex-col items-end overflow-clip border-2 border-ink bg-card p-3">
+		<div class="flex items-center gap-2">
+			<!-- Stroke SVGs used as alpha masks so we can recolor them (accent on hover:
+			     purple in light mode, yellow in dark mode). -->
+			<button
+				type="button"
+				class="group flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0"
+				aria-label="Copy QR code"
+				onclick={copyImage}
+			>
+				<span
+					class="block h-6 w-6 bg-ink transition-colors duration-[50ms] ease-linear group-hover:bg-accent [-webkit-mask:var(--icon)_center/contain_no-repeat] [mask:var(--icon)_center/contain_no-repeat]"
+					style:--icon={`url("${copyIcon}")`}
+				></span>
 			</button>
-			<button type="button" class="icon-btn" aria-label="Download QR code" onclick={downloadImage}>
-				<span class="icon" style:--icon={`url("${downloadIcon}")`}></span>
+			<button
+				type="button"
+				class="group flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0"
+				aria-label="Download QR code"
+				onclick={downloadImage}
+			>
+				<span
+					class="block h-6 w-6 bg-ink transition-colors duration-[50ms] ease-linear group-hover:bg-accent [-webkit-mask:var(--icon)_center/contain_no-repeat] [mask:var(--icon)_center/contain_no-repeat]"
+					style:--icon={`url("${downloadIcon}")`}
+				></span>
 			</button>
 		</div>
 	</div>
 </section>
-
-<style>
-	.preview {
-		width: 385px;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-	.qr-card,
-	.actions-card {
-		width: 100%;
-		border: 2px solid var(--ink);
-		padding: 12px;
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		overflow: clip;
-	}
-	/* Icon section: solid card fill (white in light mode, black in dark). The QR
-	   section's fill comes from the chosen bg colour / checkerboard instead. */
-	.actions-card {
-		background: var(--card-bg);
-	}
-	/* Transparent mode: show a checkerboard behind the QR so the transparency reads.
-	   Mid-tone greys (not white/light-grey) so the QR stays visible whether its
-	   modules are dark (light mode) or white (dark mode); fine 8px squares average
-	   to a neutral grey behind each module instead of half-hiding it. */
-	.qr-card.checker {
-		background-color: #b8b8b8;
-		background-image:
-			linear-gradient(45deg, #8c8c8c 25%, transparent 25%),
-			linear-gradient(-45deg, #8c8c8c 25%, transparent 25%),
-			linear-gradient(45deg, transparent 75%, #8c8c8c 75%),
-			linear-gradient(-45deg, transparent 75%, #8c8c8c 75%);
-		background-size: 8px 8px;
-		background-position: 0 0, 0 4px, 4px -4px, -4px 0;
-	}
-	.qr {
-		position: relative;
-		width: 100%;
-		aspect-ratio: 357 / 356;
-	}
-	.qr img {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-		display: block;
-		/* The source PNG has crisp integer-pixel modules, but it's downscaled to the
-		   fixed card width (e.g. 1008px → ~714 device px) by a non-integer factor.
-		   With smooth resampling the module edges land mid-device-pixel and get
-		   averaged into grey seams ("subpixel offsets"). Force nearest-neighbour so
-		   each device pixel samples one source pixel — halves the grey edge pixels
-		   and keeps the grid sharp. Fallbacks first; `pixelated` wins where supported. */
-		image-rendering: -webkit-optimize-contrast;
-		image-rendering: crisp-edges;
-		image-rendering: pixelated;
-	}
-
-	.preview-actions {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-	.icon-btn {
-		width: 24px;
-		height: 24px;
-		padding: 0;
-		border: none;
-		background: transparent;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	/* Stroke SVGs used as alpha masks so we can recolor them (accent on hover:
-	   purple in light mode, yellow in dark mode). */
-	.icon-btn .icon {
-		width: 24px;
-		height: 24px;
-		display: block;
-		background: var(--ink);
-		-webkit-mask: var(--icon) center / contain no-repeat;
-		mask: var(--icon) center / contain no-repeat;
-		transition: background-color 0.05s linear;
-	}
-	.icon-btn:hover .icon {
-		background: var(--accent);
-	}
-
-	/* Mobile: fill the stacked column so the QR matches the controls' width. */
-	@media (max-width: 800px) {
-		.preview {
-			width: 100%;
-			max-width: 420px;
-		}
-	}
-</style>

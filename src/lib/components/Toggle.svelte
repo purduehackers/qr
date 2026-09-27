@@ -2,49 +2,19 @@
 	let { checked = $bindable(false), label = '' }: { checked?: boolean; label?: string } = $props();
 </script>
 
-<label class="option">
-	<span class="toggle" class:on={checked}>
-		<span class="knob"></span>
+<label class="flex w-full cursor-pointer items-center gap-2">
+	<span
+		class="h-[22px] w-10 overflow-clip border border-ink p-[3px] transition-colors duration-[25ms] ease-linear {checked
+			? 'bg-accent'
+			: 'bg-track'}"
+	>
+		<!-- Content box is 32px wide, knob 14px → slides 18px to sit flush right. -->
+		<span
+			class="block h-[14px] w-[14px] border border-ink bg-surface transition-transform duration-100 ease-out {checked
+				? 'translate-x-[18px]'
+				: ''}"
+		></span>
 	</span>
 	<input type="checkbox" bind:checked hidden />
-	<span class="option-label">{label}</span>
+	<span class="font-neutral text-xs text-ink">{label}</span>
 </label>
-
-<style>
-	.option {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		width: 100%;
-		cursor: pointer;
-	}
-	.option-label {
-		font-family: 'PolySans Neutral', sans-serif;
-		font-size: 12px;
-		color: var(--ink);
-	}
-	.toggle {
-		width: 40px;
-		height: 22px;
-		background: var(--track);
-		border: 1px solid var(--ink);
-		padding: 3px;
-		overflow: clip;
-		transition: background-color 0.025s linear;
-	}
-	.toggle.on {
-		background: var(--accent);
-	}
-	.toggle .knob {
-		display: block;
-		width: 14px;
-		height: 14px;
-		background: var(--surface);
-		border: 1px solid var(--ink);
-		transition: transform 0.1s ease-out;
-	}
-	/* Content box is 32px wide, knob 14px → slides 18px to sit flush right. */
-	.toggle.on .knob {
-		transform: translateX(18px);
-	}
-</style>
