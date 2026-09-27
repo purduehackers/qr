@@ -1,8 +1,8 @@
 <script lang="ts">
-	import bgUrl from '$lib/assets/bg.png';
 	import QrCode from '$lib/components/QrCode.svelte';
 	import Toggle from '$lib/components/Toggle.svelte';
 	import ColorSwatch from '$lib/components/ColorSwatch.svelte';
+	import NoiseTexture from '$lib/components/NoiseTexture.svelte';
 
 	// Logo options are whatever is available in the logos folder — drop a
 	// logo3.png into src/lib/assets/logos and it shows up automatically.
@@ -27,7 +27,9 @@
 	<title>just a purdue hackers QR code generator</title>
 </svelte:head>
 
-<div class="page" style:--bg-image={`url(${bgUrl})`}>
+<div class="page">
+	<NoiseTexture seed={text} />
+
 	<header class="header">
 		<div class="brand" aria-label="Purdue Hackers">
 			<span class="px" style="left: 0; top: 20.667px;"></span>
@@ -110,19 +112,6 @@
 		width: 100%;
 		background-color: var(--surface);
 		overflow: hidden;
-	}
-	/* Tiled background texture — its own layer so dark mode can dim it. */
-	.page::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background-image: var(--bg-image);
-		background-repeat: repeat;
-		background-position: top left;
-		background-size: 1568px 1568px;
-		opacity: var(--tex-opacity);
-		pointer-events: none;
-		z-index: 0;
 	}
 
 	@media (prefers-color-scheme: dark) {
