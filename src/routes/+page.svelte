@@ -23,23 +23,34 @@
 	let bgColor = $state('#ffffff');
 	let invertLogo = $state(false);
 
+	// Explicit theme override. `null` until mount = follow the OS via the CSS media
+	// query (no class → no hydration flash). Once set, the .light/.dark class on
+	// .page wins over the media query.
+	let theme = $state<'light' | 'dark' | null>(null);
+
 	// In dark mode, default the QR to white-on-black so it matches the page theme.
 	// Done on mount (client only) so SSR keeps the light defaults and the color
 	// swatches don't hydrate-mismatch; runs before any user interaction, so it's
 	// only a default — picking a colour afterwards sticks.
 	onMount(() => {
-		if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+		if (prefersDark) {
 			color = '#ffffff';
 			bgColor = '#000000';
 		}
+		theme = prefersDark ? 'dark' : 'light';
 	});
+
+	function toggleTheme() {
+		theme = theme === 'dark' ? 'light' : 'dark';
+	}
 </script>
 
 <svelte:head>
 	<title>just a purdue hackers QR code generator</title>
 </svelte:head>
 
-<div class="page">
+<div class="page" class:light={theme === 'light'} class:dark={theme === 'dark'}>
 	<NoiseTexture seed={text} />
 
 	<header class="header">
@@ -107,6 +118,44 @@
 			{invertLogo}
 		/>
 	</main>
+
+	<button
+		type="button"
+		class="theme-toggle"
+		onclick={toggleTheme}
+		aria-label="Toggle dark mode"
+	>
+		{#if theme === 'dark'}
+			<!-- sun — click to switch to light -->
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<circle cx="12" cy="12" r="4" />
+				<path
+					d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+				/>
+			</svg>
+		{:else}
+			<!-- moon — click to switch to dark -->
+			<svg
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				aria-hidden="true"
+			>
+				<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+			</svg>
+		{/if}
+	</button>
 </div>
 
 <style>
@@ -118,6 +167,7 @@
 		--accent: #7d3bff;
 		--track: #cccccc;
 		--divider: #949494;
+		--card-bg: #ffffff;
 		--tex-opacity: 1;
 		position: relative;
 		min-height: 100vh;
@@ -126,16 +176,52 @@
 		overflow: hidden;
 	}
 
+	/* Follow the OS unless the user has picked a theme explicitly (.light/.dark). */
 	@media (prefers-color-scheme: dark) {
-		.page {
+		.page:not(.light):not(.dark) {
 			--ink: #fbf7ec;
 			--surface: #000000;
 			--muted: #d8cdae;
 			--accent: #fcd202;
 			--track: #4e4949;
 			--divider: #4e4949;
+			--card-bg: #000000;
 			--tex-opacity: 0.1;
 		}
+	}
+
+	/* Explicit dark choice — wins over the media query above. */
+	.page.dark {
+		--ink: #fbf7ec;
+		--surface: #000000;
+		--muted: #d8cdae;
+		--accent: #fcd202;
+		--track: #4e4949;
+		--divider: #4e4949;
+		--card-bg: #000000;
+		--tex-opacity: 0.1;
+	}
+
+	.theme-toggle {
+		position: fixed;
+		bottom: 24px;
+		right: 24px;
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+		background: var(--surface);
+		border: 2px solid var(--ink);
+		color: var(--ink);
+		cursor: pointer;
+		z-index: 2;
+	}
+	.theme-toggle svg {
+		width: 20px;
+		height: 20px;
+		display: block;
 	}
 
 	/* Header */

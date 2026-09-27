@@ -499,13 +499,17 @@
 	.qr-card,
 	.actions-card {
 		width: 100%;
-		background: #fff;
-		border: 2px solid #000;
+		border: 2px solid var(--ink);
 		padding: 12px;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
 		overflow: clip;
+	}
+	/* Icon section: solid card fill (white in light mode, black in dark). The QR
+	   section's fill comes from the chosen bg colour / checkerboard instead. */
+	.actions-card {
+		background: var(--card-bg);
 	}
 	/* Transparent mode: show a checkerboard behind the QR so the transparency reads.
 	   Mid-tone greys (not white/light-grey) so the QR stays visible whether its
@@ -566,7 +570,7 @@
 		width: 24px;
 		height: 24px;
 		display: block;
-		background: #000;
+		background: var(--ink);
 		-webkit-mask: var(--icon) center / contain no-repeat;
 		mask: var(--icon) center / contain no-repeat;
 		transition: background-color 0.15s linear;
