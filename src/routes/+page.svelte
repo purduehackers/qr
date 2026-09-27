@@ -47,7 +47,7 @@
 </script>
 
 <svelte:head>
-	<title>just a purdue hackers QR code generator</title>
+	<title>Purdue Hackers QR</title>
 </svelte:head>
 
 <div class="page" class:light={theme === 'light'} class:dark={theme === 'dark'}>
@@ -62,7 +62,10 @@
 			<span class="px" style="left: 10.333px; top: 0;"></span>
 		</div>
 		<div class="tagline">
-			<p class="title">just a purdue hackers QR code generator</p>
+			<p class="title">
+				<span class="title-full">just a purdue hackers QR code generator</span>
+				<span class="title-short">purdue hackers QR code generator</span>
+			</p>
 			<a class="github" href="#">check out da github</a>
 		</div>
 	</header>
@@ -264,6 +267,10 @@
 		color: var(--ink);
 		white-space: nowrap;
 	}
+	/* Full wording on desktop; the mobile media query swaps in the short one. */
+	.title-short {
+		display: none;
+	}
 	.github {
 		font-family: 'PixelHackers', monospace;
 		font-size: 12px;
@@ -364,7 +371,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: border-width 0.15s linear, border-color 0.15s linear;
+		transition: border-width 0.05s linear, border-color 0.05s linear;
 	}
 	.logo-box.selected {
 		border-width: 4px;
@@ -401,12 +408,38 @@
 	@media (max-width: 800px) {
 		.stage {
 			position: static;
-			flex-direction: column;
-			padding: 120px 24px 48px;
+			/* QR preview on top, data + settings underneath it. */
+			flex-direction: column-reverse;
+			align-items: center;
+			padding: 96px 24px 48px;
 			gap: 24px;
 		}
+		/* Match the QR preview's width so the two stack equiwidth (see QrCode.svelte). */
+		.controls {
+			width: 100%;
+			max-width: 420px;
+		}
+
+		/* Shrink the top-right title/link so it doesn't dominate the small screen. */
+		.header {
+			top: 20px;
+		}
+		.tagline {
+			width: auto;
+			gap: 4px;
+		}
 		.title {
-			white-space: normal;
+			font-size: 15px;
+			line-height: 1.2;
+		}
+		.title-full {
+			display: none;
+		}
+		.title-short {
+			display: inline;
+		}
+		.github {
+			font-size: 10px;
 		}
 	}
 </style>

@@ -494,7 +494,7 @@
 		width: 385px;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 8px;
 	}
 	.qr-card,
 	.actions-card {
@@ -573,9 +573,17 @@
 		background: var(--ink);
 		-webkit-mask: var(--icon) center / contain no-repeat;
 		mask: var(--icon) center / contain no-repeat;
-		transition: background-color 0.15s linear;
+		transition: background-color 0.05s linear;
 	}
 	.icon-btn:hover .icon {
 		background: var(--accent);
+	}
+
+	/* Mobile: fill the stacked column so the QR matches the controls' width. */
+	@media (max-width: 800px) {
+		.preview {
+			width: 100%;
+			max-width: 420px;
+		}
 	}
 </style>

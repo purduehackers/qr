@@ -30,7 +30,7 @@
 		border: 1px solid var(--ink);
 		padding: 3px;
 		overflow: clip;
-		transition: background-color 0.1s linear;
+		transition: background-color 0.025s linear;
 	}
 	.toggle.on {
 		background: var(--accent);
@@ -41,7 +41,7 @@
 		height: 14px;
 		background: var(--surface);
 		border: 1px solid var(--ink);
-		transition: transform 0.1s linear;
+		transition: transform 0.1s ease-out;
 	}
 	/* Content box is 32px wide, knob 14px → slides 18px to sit flush right. */
 	.toggle.on .knob {

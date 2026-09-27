@@ -1,29 +1,99 @@
 /* Fonts from the Figma design.
-   Drop the actual font files into static/fonts/ (see static/fonts/README.md). */
+   Font files live in src/lib/assets/fonts/ and are bundled by Vite. */
 @font-face {
 	font-family: 'PixelHackers';
-	src: url('/fonts/PixelHackers.woff2') format('woff2');
+	src: url('./lib/assets/fonts/PixelHackers.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Whyte';
+	src: url('./lib/assets/fonts/Whyte.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Slim';
+	src: url('./lib/assets/fonts/PolySans-Slim.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Slim';
+	src: url('./lib/assets/fonts/PolySans-SlimItalic.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Neutral';
+	src: url('./lib/assets/fonts/PolySans-Neutral.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Neutral';
+	src: url('./lib/assets/fonts/PolySans-NeutralItalic.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Median';
+	src: url('./lib/assets/fonts/PolySans-Median.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Median';
+	src: url('./lib/assets/fonts/PolySans-MedianItalic.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Bulky';
+	src: url('./lib/assets/fonts/PolySans-Bulky.woff2') format('woff2');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Bulky';
+	src: url('./lib/assets/fonts/PolySans-BulkyItalic.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Relax';
+	src: url('./lib/assets/fonts/PolySans-Relax.woff2') format('woff2');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
 }
 @font-face {
 	font-family: 'PolySans Relax';
-	src: url('/fonts/PolySans-Relax.woff2') format('woff2');
+	src: url('./lib/assets/fonts/PolySans-RelaxItalic.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'PolySans Inky';
+	src: url('./lib/assets/fonts/PolySans-Inky.woff2') format('woff2');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
 }
 @font-face {
-	font-family: 'PolySans Neutral';
-	src: url('/fonts/PolySans-Neutral.woff2') format('woff2');
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
-}
-@font-face {
-	font-family: 'PolySans Neutral';
-	src: url('/fonts/PolySans-NeutralItalic.woff2') format('woff2');
+	font-family: 'PolySans Inky';
+	src: url('./lib/assets/fonts/PolySans-InkyItalic.woff2') format('woff2');
 	font-weight: 400;
 	font-style: italic;
 	font-display: swap;
