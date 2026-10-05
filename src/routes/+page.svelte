@@ -3,6 +3,7 @@
 	import QrCode from '$lib/components/QrCode.svelte';
 	import Toggle from '$lib/components/Toggle.svelte';
 	import ColorSwatch from '$lib/components/ColorSwatch.svelte';
+	import Slider from '$lib/components/Slider.svelte';
 	import NoiseTexture from '$lib/components/NoiseTexture.svelte';
 
 	// Logo options are whatever is available in the logos folder — drop a
@@ -22,6 +23,9 @@
 	let color = $state('#000000');
 	let bgColor = $state('#ffffff');
 	let invertLogo = $state(false);
+	// Logo size as a fraction of the QR width. The QR component clamps it so the mark
+	// never covers the finder patterns (so on a small QR the top of the range is a no-op).
+	let logoSize = $state(0.3);
 
 	// Explicit theme override. `null` until mount = follow the OS via the CSS media
 	// query (no class → no hydration flash). Once set, the .light/.dark class on
@@ -114,6 +118,8 @@
 					<div class="h-px w-full bg-divider"></div>
 
 					<div class="flex w-full flex-col items-start gap-2">
+						<!-- Logo size slider hidden for now; the QR uses the logoSize default from the script. -->
+						<!-- <Slider bind:value={logoSize} min={0.15} max={0.4} step={0.01} label="logo size" /> -->
 						<Toggle bind:checked={invertLogo} label="invert logo" />
 						<ColorSwatch bind:value={color} label="color" />
 						<ColorSwatch bind:value={bgColor} label="background color" disabled={transparent} />
@@ -129,6 +135,7 @@
 			{text}
 			logoUrl={logos[selected]?.url}
 			logoName={logos[selected]?.name}
+			logoFraction={logoSize}
 			{color}
 			{bgColor}
 			{transparent}

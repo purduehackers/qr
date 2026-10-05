@@ -8,6 +8,7 @@
 		text = '',
 		logoUrl = undefined,
 		logoName = '',
+		logoFraction = 0.3,
 		color = '#000000',
 		bgColor = '#ffffff',
 		transparent = false,
@@ -16,6 +17,7 @@
 		text?: string;
 		logoUrl?: string;
 		logoName?: string;
+		logoFraction?: number;
 		color?: string;
 		bgColor?: string;
 		transparent?: boolean;
@@ -39,6 +41,12 @@
 	let srcImage: HTMLImageElement | null = null;
 	let srcModuleCount = 0;
 	let srcCellPx = 0;
+	// Side of the centred logo tile in modules (0 = no logo).
+	let srcLogoTileModules = 0;
+	// Free-form (line-art) logos are blitted as one smoothly-scaled image; blocky
+	// logos are snapped onto the module grid and painted per-module like the QR itself
+	// (see paintCanvas). This flag distinguishes the two.
+	let srcLogoSmooth = false;
 
 	function hexToRgb(hex: string) {
 		const m = hex.replace('#', '');
@@ -77,7 +85,8 @@
 		fill: { r: number; g: number; b: number },
 		invert: boolean,
 		markFraction = 0.8,
-		preserveFrame = false
+		preserveFrame = false,
+		snap?: { grid: number; markModules: number; tileModules: number; cellPx: number }
 	): Promise<string> {
 		const img = await loadImage(url);
 		const w = img.naturalWidth || 600;
@@ -139,6 +148,59 @@
 		}
 		mctx.putImageData(markData, 0, 0);
 
+		// Grid-snap path: rasterize the mark onto whole QR modules so its blocks line up
+		// with the code instead of floating at an arbitrary scale. We read the logo's
+		// native grid×grid block pattern (averaging each block's alpha, so the source
+		// PNG's anti-aliasing doesn't matter) and paint each "on" block as a solid b×b-
+		// module square — awesome-qr later draws this canvas 1:1 over the (module-aligned)
+		// logo tile, so the blocks are module-sized and, parity permitting, on module lines.
+		if (snap) {
+			const { grid, markModules, tileModules, cellPx } = snap;
+			const b = markModules / grid;
+			const native: boolean[] = [];
+			for (let gy = 0; gy < grid; gy++) {
+				for (let gx = 0; gx < grid; gx++) {
+					const x0 = Math.floor((gx * bw) / grid);
+					const x1 = Math.max(x0 + 1, Math.floor(((gx + 1) * bw) / grid));
+					const y0 = Math.floor((gy * bh) / grid);
+					const y1 = Math.max(y0 + 1, Math.floor(((gy + 1) * bh) / grid));
+					let sum = 0;
+					let cnt = 0;
+					for (let y = y0; y < y1; y++) {
+						for (let x = x0; x < x1; x++) {
+							sum += m[(y * bw + x) * 4 + 3];
+							cnt++;
+						}
+					}
+					native[gy * grid + gx] = cnt > 0 && sum / cnt > 127;
+				}
+			}
+			const OUT = tileModules * cellPx;
+			// Centre the mark in the tile. An even mark in an odd tile can't be both
+			// centred and on module lines; we take centred — an off-centre logo reads
+			// worse than blocks sitting half a module off the grid. cellPx is even, so the
+			// half-module shift is still a whole number of pixels and edges stay crisp.
+			const off = (OUT - markModules * cellPx) / 2;
+			const snapCanvas = document.createElement('canvas');
+			snapCanvas.width = OUT;
+			snapCanvas.height = OUT;
+			const sctx2 = snapCanvas.getContext('2d');
+			if (!sctx2) return url;
+			sctx2.fillStyle = `rgb(${fill.r},${fill.g},${fill.b})`;
+			// invert: solid tile with the mark knocked out; normal: just the mark blocks.
+			if (invert) sctx2.fillRect(0, 0, OUT, OUT);
+			for (let cj = 0; cj < markModules; cj++) {
+				for (let ci = 0; ci < markModules; ci++) {
+					if (!native[Math.floor(cj / b) * grid + Math.floor(ci / b)]) continue;
+					const px = off + ci * cellPx;
+					const py = off + cj * cellPx;
+					if (invert) sctx2.clearRect(px, py, cellPx, cellPx);
+					else sctx2.fillRect(px, py, cellPx, cellPx);
+				}
+			}
+			return snapCanvas.toDataURL('image/png');
+		}
+
 		// Place the mark into a square tile at the requested fraction (leaving the
 		// margin), then either keep it (normal) or knock it out of a filled tile.
 		const OUT = 600;
@@ -171,7 +233,7 @@
 		// @ts-ignore: the prebuilt browser bundle ships no type declarations
 		const mod = await import('awesome-qr/dist/awesome-qr.js');
 		AwesomeQR = mod.AwesomeQR ?? mod.default?.AwesomeQR ?? mod.default;
-		scheduleGenerate([text, logoUrl, logoName, transparent, color, bgColor, invertLogo]);
+		scheduleGenerate([text, logoUrl, logoName, transparent, color, bgColor, invertLogo, logoFraction]);
 	});
 
 	// Repaint at the new device-pixel size whenever the card is resized (viewport
@@ -183,13 +245,16 @@
 	});
 
 	const SIZE = 1024;
-	const LOGO_FRACTION = 0.3; // logo spans ~30% of the QR
 	// Per-logo gap (in QR modules) between the mark and the surrounding modules.
 	const LOGO_MARGIN_MODULES: Record<string, number> = { 'logo2.png': 0 };
 	const DEFAULT_LOGO_MARGIN = 1;
 	// Logos that carry their own framing/whitespace: keep the full source canvas
 	// instead of tight-cropping, so their native aspect ratio is respected.
 	const LOGO_PRESERVE_FRAME = new Set(['logo2.png']);
+	// Blocky logos built on an N×N grid of square cells → snap them onto the QR module
+	// grid so each native block is a whole number of modules on module boundaries. The
+	// value is the logo's native grid size (the Purdue Hackers mark is a 3×3 arrangement).
+	const LOGO_GRID: Record<string, number> = { 'logo1.png': 3 };
 
 	// Sentinel background for transparent mode — must be far from the QR colour
 	// (raw and washed forms) so stripping it can't affect the dark modules.
@@ -309,12 +374,7 @@
 		return canvas.toDataURL('image/png');
 	}
 
-	// Module count depends only on the text, so cache it and skip the measure
-	// render when just colours/logo change.
-	let cachedContent: string | null = null;
-	let cachedModuleCount = 0;
-
-	type GenArgs = [string, string | undefined, string, boolean, string, string, boolean];
+	type GenArgs = [string, string | undefined, string, boolean, string, string, boolean, number];
 
 	// Serialize renders: overlapping awesome-qr draws corrupt its shared encoder
 	// state (the stray-colour artifacts). Coalesce to the latest requested args.
@@ -346,7 +406,8 @@
 		tr: boolean,
 		c: string,
 		bg: string,
-		inv: boolean
+		inv: boolean,
+		frac: number
 	) {
 		const QR = AwesomeQR;
 		if (!QR) return;
@@ -377,34 +438,72 @@
 			}
 		};
 		try {
-			// Measure the module grid once per text (cached), so colour/logo changes
-			// are a single render.
-			let moduleCount = cachedModuleCount;
-			if (content !== cachedContent || moduleCount <= 0) {
-				const measured = await new QR({ ...commonOpts, size: SIZE }).draw();
-				if (typeof measured !== 'string') return;
-				moduleCount = await detectModuleCount(measured, c, bgEffective, false);
-				cachedContent = content;
-				cachedModuleCount = moduleCount;
-			}
+			// The encoder picks the QR version (hence the module count) as soon as the
+			// instance is built, so read it straight off the model. Inferring it from a
+			// rendered image was fragile: with a light QR colour the library's white wash
+			// made light modules read as foreground, the finder run spanned the whole row,
+			// and the count collapsed to 21 — so the logo tile and the display grid were
+			// sized for the wrong QR (the misalignment, and a logo that never scaled).
+			const moduleCount = (new QR(commonOpts) as unknown as { qrCode?: { moduleCount: number } })
+				.qrCode?.moduleCount;
+			if (!moduleCount || moduleCount <= 0) return;
 
 			// Render at an exact integer multiple of the module count so every module
-			// is a whole number of pixels — no fractional-boundary seams.
-			const cellPx = Math.max(1, Math.floor(SIZE / moduleCount));
+			// is a whole number of pixels — no fractional-boundary seams. Even, so a
+			// half-module offset (tintLogo's snap path) is a whole pixel as well.
+			const cellPx = Math.max(2, 2 * Math.floor(SIZE / 2 / moduleCount));
 			const renderSize = cellPx * moduleCount;
 			const opts: Record<string, unknown> = { ...commonOpts, size: renderSize };
 
+			let tileModules = 0;
+			let logoSmooth = false;
 			if (lUrl) {
-				let tileModules = Math.round(moduleCount * LOGO_FRACTION);
-				if (tileModules % 2 === 0) tileModules += 1; // odd → stays centred
-				// Gap to surrounding modules; per-logo (logo2 fills the tile fully).
 				const marginModules = LOGO_MARGIN_MODULES[lName] ?? DEFAULT_LOGO_MARGIN;
-				const markFraction = (tileModules - 2 * marginModules) / tileModules;
-				const preserveFrame = LOGO_PRESERVE_FRAME.has(lName);
-				opts.logoImage = await tintLogo(lUrl, hexToRgb(c), inv, markFraction, preserveFrame);
-				opts.logoScale = tileModules / moduleCount;
-				opts.logoMargin = 0;
-				opts.logoCornerRadius = 0;
+				const grid = LOGO_GRID[lName];
+				if (grid) {
+					// Blocky logo (the Purdue Hackers mark): snap it onto the module grid so
+					// every native block is a whole b×b run of modules on module lines —
+					// it reads as part of the QR, not a sticker on top. Block size b tracks
+					// the requested fraction, then shrinks so the cleared tile never reaches
+					// the finder patterns (which the scanner can't recover if covered).
+					const maxTile = moduleCount - 16; // keep all three finders fully clear
+					let b = Math.max(1, Math.round((moduleCount * frac) / grid));
+					let markModules = grid * b;
+					// The tile must be odd so it centres on a whole module (QR sizes are
+					// always odd). An even mark then can't be both centred and on module
+					// lines; tintLogo centres it with a half-module shift (see its snap path).
+					tileModules = markModules + 2 * marginModules;
+					if (tileModules % 2 === 0) tileModules += 1;
+					while (b > 1 && tileModules > maxTile) {
+						b -= 1;
+						markModules = grid * b;
+						tileModules = markModules + 2 * marginModules;
+						if (tileModules % 2 === 0) tileModules += 1;
+					}
+					opts.logoImage = await tintLogo(lUrl, hexToRgb(c), inv, 1, false, {
+						grid,
+						markModules,
+						tileModules,
+						cellPx
+					});
+					opts.logoScale = tileModules / moduleCount;
+					opts.logoMargin = 0;
+					opts.logoCornerRadius = 0;
+				} else {
+					// Free-form art (line drawings): can't map to a module grid, so scale
+					// it smoothly and keep its native aspect ratio.
+					logoSmooth = true;
+					const maxTile = moduleCount - 16; // keep the finder patterns clear
+					tileModules = Math.min(maxTile, Math.round(moduleCount * frac));
+					if (tileModules % 2 === 0) tileModules -= 1; // odd → stays centred
+					tileModules = Math.max(1, tileModules);
+					const markFraction = (tileModules - 2 * marginModules) / tileModules;
+					const preserveFrame = LOGO_PRESERVE_FRAME.has(lName);
+					opts.logoImage = await tintLogo(lUrl, hexToRgb(c), inv, markFraction, preserveFrame);
+					opts.logoScale = tileModules / moduleCount;
+					opts.logoMargin = 0;
+					opts.logoCornerRadius = 0;
+				}
 			}
 
 			const result = await new QR(opts).draw();
@@ -415,6 +514,8 @@
 				srcImage = await loadImage(qrSrc);
 				srcModuleCount = moduleCount;
 				srcCellPx = cellPx;
+				srcLogoTileModules = lUrl ? tileModules : 0;
+				srcLogoSmooth = logoSmooth;
 				// Commit the card styling together with the image so they never disagree.
 				shownTransparent = tr;
 				shownBg = bg;
@@ -430,7 +531,15 @@
 	// a pixel wider than others (the visible misalignment). Instead we blit each module
 	// into its own rect with rounded, shared boundaries — so every module edge lands on a
 	// whole device pixel and widths stay uniform. imageSmoothingEnabled=false keeps the
-	// solid modules crisp; the logo tile rides along.
+	// solid modules crisp.
+	//
+	// Free-form logos (line art) are the exception: they can't map to the module grid, so
+	// slicing them per-module and nearest-neighbour scaling each slice chewed up the fine
+	// art. For those we skip the logo tile in the per-module loop and blit the whole tile
+	// once, smoothly, onto the exact same module boundaries the neighbours use. Blocky
+	// logos are module-sized (at worst shifted half a module, see tintLogo) so they ride
+	// along per-module like the QR: every cell in a column shares the same destination
+	// bounds, so even a mid-cell block edge comes out straight and crisp.
 	function paintCanvas() {
 		if (!qrCanvas || !qrBox || !srcImage || srcModuleCount <= 0) return;
 		const dpr = window.devicePixelRatio || 1;
@@ -448,14 +557,44 @@
 		if (!ctx) return;
 		ctx.clearRect(0, 0, dw, dh);
 		ctx.imageSmoothingEnabled = false;
+		// Only free-form logos get the single smooth blit; blocky logos are module-sized
+		// hard pixels, so tile = 0 leaves them to the per-module loop.
+		// Centred logo tile spans modules [k0, k0 + tile) on both axes (odd N and odd
+		// tile → k0 is a whole module, so the tile stays centred and grid-aligned).
+		const tile = srcLogoSmooth ? srcLogoTileModules : 0;
+		const k0 = (N - tile) / 2;
 		for (let j = 0; j < N; j++) {
 			const dy0 = Math.round((j * dh) / N);
 			const dy1 = Math.round(((j + 1) * dh) / N);
+			const jInLogo = tile > 0 && j >= k0 && j < k0 + tile;
 			for (let i = 0; i < N; i++) {
+				// Skip the logo tile — blitted as one image below so it stays aligned.
+				if (jInLogo && i >= k0 && i < k0 + tile) continue;
 				const dx0 = Math.round((i * dw) / N);
 				const dx1 = Math.round(((i + 1) * dw) / N);
 				ctx.drawImage(srcImage, i * cp, j * cp, cp, cp, dx0, dy0, dx1 - dx0, dy1 - dy0);
 			}
+		}
+		if (tile > 0) {
+			// Same rounded boundaries as the neighbouring modules, so the tile fills the
+			// skipped gap exactly. Smoothing on: the logo is art, not a hard pixel grid.
+			const dx0 = Math.round((k0 * dw) / N);
+			const dx1 = Math.round(((k0 + tile) * dw) / N);
+			const dy0 = Math.round((k0 * dh) / N);
+			const dy1 = Math.round(((k0 + tile) * dh) / N);
+			ctx.imageSmoothingEnabled = true;
+			ctx.imageSmoothingQuality = 'high';
+			ctx.drawImage(
+				srcImage,
+				k0 * cp,
+				k0 * cp,
+				tile * cp,
+				tile * cp,
+				dx0,
+				dy0,
+				dx1 - dx0,
+				dy1 - dy0
+			);
 		}
 	}
 
@@ -470,47 +609,12 @@
 		});
 	}
 
-	// Infer the QR's module count from a rendered data URL by measuring the width
-	// of the top-left finder pattern (a 7-module run at the top edge).
-	async function detectModuleCount(
-		dataUrl: string,
-		fgHex: string,
-		bgHex: string,
-		tr: boolean
-	): Promise<number> {
-		const img = await loadImage(dataUrl);
-		const canvas = document.createElement('canvas');
-		canvas.width = SIZE;
-		canvas.height = SIZE;
-		const ctx = canvas.getContext('2d');
-		if (!ctx) return 25;
-		ctx.drawImage(img, 0, 0, SIZE, SIZE);
-		const fg = hexToRgb(fgHex);
-		const bg = hexToRgb(bgHex);
-		const y = Math.max(1, Math.round(SIZE * 0.01));
-		const row = ctx.getImageData(0, y, SIZE, 1).data;
-		const isFg = (x: number) => {
-			const i = x * 4;
-			if (row[i + 3] < 128) return false;
-			if (tr) return true;
-			const dF = (row[i] - fg.r) ** 2 + (row[i + 1] - fg.g) ** 2 + (row[i + 2] - fg.b) ** 2;
-			const dB = (row[i] - bg.r) ** 2 + (row[i + 1] - bg.g) ** 2 + (row[i + 2] - bg.b) ** 2;
-			return dF <= dB;
-		};
-		let run = 0;
-		while (run < SIZE && isFg(run)) run++;
-		if (run < 4) return 25;
-		let mc = Math.round((SIZE / run) * 7);
-		mc = Math.round((mc - 21) / 4) * 4 + 21; // snap to a valid QR size
-		return Math.max(21, Math.min(177, mc));
-	}
-
 	// Regenerate whenever any input changes. Only text typing is debounced —
 	// discrete controls (toggles, colour, logo) fire immediately so the QR keeps
 	// pace with the control's own animation instead of lagging ~150ms behind.
 	let prevText = '';
 	$effect(() => {
-		const a: GenArgs = [text, logoUrl, logoName, transparent, color, bgColor, invertLogo];
+		const a: GenArgs = [text, logoUrl, logoName, transparent, color, bgColor, invertLogo, logoFraction];
 		if (!AwesomeQR) return;
 		const delay = text !== prevText ? 150 : 0;
 		prevText = text;
