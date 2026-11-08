@@ -641,7 +641,7 @@
 </script>
 
 <!-- Mobile: fill the stacked column so the QR matches the controls' width. -->
-<section class="flex w-[385px] flex-col gap-2 max-[800px]:w-full max-[800px]:max-w-[420px]">
+<section class="enter flex w-[385px] flex-col gap-2 [--i:1] max-[800px]:w-full max-[800px]:max-w-[420px]">
 	<!-- Transparent mode shows a checkerboard behind the QR (see the `checker` utility);
 	     otherwise the card takes the chosen bg colour. -->
 	<div

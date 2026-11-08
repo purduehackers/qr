@@ -45,23 +45,19 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Purdue Hackers QR</title>
-</svelte:head>
-
 <div class="relative min-h-screen w-full overflow-hidden bg-background">
 	<NoiseTexture seed={text} />
 
 	<header
 		class="absolute top-[29px] left-0 z-[1] flex w-full items-start justify-between px-6 max-[800px]:top-5"
 	>
-		<Glider label="Purdue Hackers" class="size-[31px]" />
-		<div class="flex w-[387px] flex-col items-end gap-1.5 max-[800px]:w-auto max-[800px]:gap-1">
+		<Glider label="Purdue Hackers" class="enter size-[31px]" />
+		<div class="enter flex w-[387px] flex-col items-end gap-1.5 max-[800px]:w-auto max-[800px]:gap-1">
 			<p class="m-0 ph-headline text-[20px] whitespace-nowrap max-[800px]:text-[15px]">
-				<span class="max-[800px]:hidden">just a purdue hackers QR code generator</span>
-				<span class="hidden max-[800px]:inline">purdue hackers QR code generator</span>
+				<span class="max-[800px]:hidden">Just a Purdue Hackers QR code generator</span>
+				<span class="hidden max-[800px]:inline">Purdue Hackers QR code generator</span>
 			</p>
-			<Link class="font-mono text-xs" href="#">Check out the Github</Link>
+			<Link class="font-mono text-xs" href="#">Check out the GitHub</Link>
 		</div>
 	</header>
 
@@ -69,11 +65,11 @@
 		class="absolute inset-0 z-[1] flex items-center justify-center gap-5 max-[800px]:relative max-[800px]:flex-col-reverse max-[800px]:gap-6 max-[800px]:px-6 max-[800px]:pt-24 max-[800px]:pb-12"
 	>
 		<section class="flex w-[358px] flex-col items-start gap-4 max-[800px]:w-full max-[800px]:max-w-[420px]">
-			<Field label="QR code data" for="qr-text" class="w-full">
+			<Field label="QR code data" for="qr-text" class="enter w-full [--i:1]">
 				<Textarea id="qr-text" class="resize-none" bind:value={text} placeholder="mrrow mrrp meow" />
 			</Field>
 
-			<Field label="Settings" class="w-full">
+			<Field label="Settings" class="enter w-full [--i:2]">
 				<div class="flex w-full flex-col items-start gap-3 border border-border bg-card p-3">
 					<div class="flex h-[50px] items-end gap-2" role="group" aria-label="Logo">
 						{#each logos as logo, i (logo.name)}
