@@ -1,0 +1,14 @@
+<script lang="ts">
+	import type { HTMLTextareaAttributes } from 'svelte/elements';
+
+	let { value = $bindable(), class: className, ...rest }: HTMLTextareaAttributes = $props();
+</script>
+
+<textarea
+	bind:value
+	class={[
+		'min-h-24 py-2 w-full min-w-0 border border-input bg-card px-3 font-sans text-[15px] text-card-foreground outline-none transition-colors duration-150 ease-quint placeholder:text-card-foreground/55 focus-visible:border-foreground disabled:cursor-not-allowed disabled:opacity-40 aria-invalid:border-ph-orange',
+		className
+	]}
+	{...rest}
+></textarea>

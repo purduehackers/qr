@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { AwesomeQR as AwesomeQRClass } from 'awesome-qr';
-	import copyIcon from '$lib/assets/icon-copy.svg';
-	import downloadIcon from '$lib/assets/icon-download.svg';
+	import Button from '$lib/components/ph/Button.svelte';
 
 	let {
 		text = '',
@@ -646,7 +645,7 @@
 	<!-- Transparent mode shows a checkerboard behind the QR (see the `checker` utility);
 	     otherwise the card takes the chosen bg colour. -->
 	<div
-		class="flex w-full flex-col items-end overflow-clip border-2 border-ink p-3"
+		class="flex w-full flex-col items-end overflow-clip border border-border p-3"
 		class:checker={shownTransparent}
 		style={shownTransparent ? undefined : `background:${shownBg}`}
 	>
@@ -661,33 +660,8 @@
 			>Generated QR code</canvas>
 		</div>
 	</div>
-	<!-- Icon section: solid card fill (white in light mode, black in dark). -->
-	<div class="flex w-full flex-col items-end overflow-clip border-2 border-ink bg-card p-3">
-		<div class="flex items-center gap-2">
-			<!-- Stroke SVGs used as alpha masks so we can recolor them (accent on hover:
-			     purple in light mode, yellow in dark mode). -->
-			<button
-				type="button"
-				class="group flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0"
-				aria-label="Copy QR code"
-				onclick={copyImage}
-			>
-				<span
-					class="block h-6 w-6 bg-ink transition-colors duration-[50ms] ease-linear group-hover:bg-accent [-webkit-mask:var(--icon)_center/contain_no-repeat] [mask:var(--icon)_center/contain_no-repeat]"
-					style:--icon={`url("${copyIcon}")`}
-				></span>
-			</button>
-			<button
-				type="button"
-				class="group flex h-6 w-6 cursor-pointer items-center justify-center border-none bg-transparent p-0"
-				aria-label="Download QR code"
-				onclick={downloadImage}
-			>
-				<span
-					class="block h-6 w-6 bg-ink transition-colors duration-[50ms] ease-linear group-hover:bg-accent [-webkit-mask:var(--icon)_center/contain_no-repeat] [mask:var(--icon)_center/contain_no-repeat]"
-					style:--icon={`url("${downloadIcon}")`}
-				></span>
-			</button>
-		</div>
+	<div class="flex w-full justify-end gap-2 border border-border bg-card p-2">
+		<Button variant="ghost" size="sm" icon="copy" onclick={copyImage}>Copy</Button>
+		<Button variant="outline" size="sm" icon="download" onclick={downloadImage}>Download</Button>
 	</div>
 </section>
